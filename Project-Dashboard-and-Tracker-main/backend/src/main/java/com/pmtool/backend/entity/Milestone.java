@@ -10,63 +10,75 @@ import java.util.Set;
 @Table(name = "milestones")
 public class Milestone {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(name = "milestone_name", nullable = false)
-    private String name;
+	@Column(name = "milestone_name", nullable = false)
+	private String name;
 
-    @Column(name = "due_date")
-    private LocalDate dueDate;
+	@Column(name = "due_date")
+	private LocalDate dueDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id", nullable = false)
-    private Project project;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "project_id", nullable = false)
+	private Project project;
 
-    @OneToMany(mappedBy = "milestone", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<WorkLogEntry> workLogEntries;
-    
-    @OneToMany(mappedBy = "milestone", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<ProjectAssignment> projectAssignments = new HashSet<ProjectAssignment>();
+	@OneToMany(mappedBy = "milestone", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private Set<WorkLogEntry> workLogEntries;
 
-    public Milestone() {
-    }
+	@OneToMany(mappedBy = "milestone", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private Set<ProjectAssignment> projectAssignments = new HashSet<ProjectAssignment>();
 
-    public Long getId() {
-        return id;
-    }
+	public Milestone() {
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public LocalDate getDueDate() {
-        return dueDate;
-    }
-    public void setDueDate(LocalDate dueDate){this.dueDate=dueDate;}
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public Project getProject() {
-        return project;
-    }
+	public LocalDate getDueDate() {
+		return dueDate;
+	}
 
-    public void setProject(Project project) {
-        this.project = project;
-    }
+	public void setDueDate(LocalDate dueDate) {
+		this.dueDate = dueDate;
+	}
 
-    public Set<WorkLogEntry> getWorkLogEntries() {
-        return workLogEntries;
-    }
+	public Project getProject() {
+		return project;
+	}
 
-    public void setWorkLogEntries(Set<WorkLogEntry> workLogEntries) {
-        this.workLogEntries = workLogEntries;
-    }
+	public void setProject(Project project) {
+		this.project = project;
+	}
+
+	public Set<WorkLogEntry> getWorkLogEntries() {
+		return workLogEntries;
+	}
+
+	public void setWorkLogEntries(Set<WorkLogEntry> workLogEntries) {
+		this.workLogEntries = workLogEntries;
+	}
+
+	public Set<ProjectAssignment> getProjectAssignments() {
+		return projectAssignments;
+	}
+
+	public void setProjectAssignments(Set<ProjectAssignment> projectAssignments) {
+		this.projectAssignments = projectAssignments;
+	}
+
 }

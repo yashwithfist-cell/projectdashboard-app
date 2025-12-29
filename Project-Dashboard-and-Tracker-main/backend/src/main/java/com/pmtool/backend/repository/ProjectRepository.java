@@ -16,10 +16,24 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 	@Query("SELECT d FROM Discipline d WHERE d.project.id = :projectId")
 	List<Discipline> findDisciplinesByProjectId(@Param("projectId") Long projectId);
 
-	@Query("SELECT new com.pmtool.backend.DTO.ProjectResponseDTO( p.id, p.name, p.clientName,SUM(w.hoursWorked), p.employee.employeeId) FROM WorkLogEntry w RIGHT JOIN w.project p GROUP BY p.id,p.name,p.clientName, p.employee.employeeId ORDER BY p.name")
+//	@Query("SELECT new com.pmtool.backend.DTO.ProjectResponseDTO( p.id, p.name, p.clientName,SUM(w.hoursWorked), p.employee.employeeId) FROM WorkLogEntry w RIGHT JOIN w.project p GROUP BY p.id,p.name,p.clientName, p.employee.employeeId ORDER BY p.name")
+	@Query("""
+			SELECT new com.pmtool.backend.DTO.ProjectResponseDTO(
+			    p.id,
+			    p.name,
+			    p.clientName,
+			    COALESCE(SUM(a.totalWorkedSeconds), 0) / 3600.0,
+			    p.employee.employeeId
+			)
+			FROM Project p
+			LEFT JOIN p.assignments a
+			GROUP BY p.id, p.name, p.clientName, p.employee.employeeId
+			ORDER BY p.name
+			""")
+
 	List<ProjectResponseDTO> findAllWithHoursConsumed();
 
-	@Query("SELECT p FROM Project p WHERE p.employee.username = :username")
+	@Query("SELECT p FROM Project p WHERE p.employee.username = :username GROUP BY p.id")
 	List<Project> findAllByUserName(@Param("username") String username);
 
 	@Query("""

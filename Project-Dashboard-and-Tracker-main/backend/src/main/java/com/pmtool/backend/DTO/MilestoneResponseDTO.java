@@ -1,8 +1,11 @@
 package com.pmtool.backend.DTO;
 
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.Optional;
 
 import com.pmtool.backend.entity.Milestone;
+import com.pmtool.backend.entity.ProjectAssignment;
 
 public class MilestoneResponseDTO {
 
@@ -71,7 +74,11 @@ public class MilestoneResponseDTO {
 			this.projectName = milestone.getProject().getName();
 		}
 
-		this.hoursConsumed = Double.valueOf(0.0D);
+		this.hoursConsumed = Optional.ofNullable(milestone.getProjectAssignments())
+				.orElse(Collections.emptySet())
+		        .stream()
+		        .mapToDouble(ProjectAssignment::getTotalWorkedSeconds)
+		        .sum() / 3600.0;
 	}
 
 }
