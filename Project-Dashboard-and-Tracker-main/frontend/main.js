@@ -1,8 +1,9 @@
 import path from "path";
 import { fileURLToPath } from "url";
 import { app, BrowserWindow, powerMonitor } from "electron";
-import { autoUpdater } from "electron-updater";
+import updater from "electron-updater";
 
+const { autoUpdater } = updater;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
