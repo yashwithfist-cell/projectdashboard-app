@@ -1,8 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import api from '../utils/api';
 import Select from 'react-select';
+import {
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    Legend,
+    ResponsiveContainer,
+    PieChart,
+    Pie,
+    Cell
+} from 'recharts';
+
+const StatCard = ({ title, value, color }) => (
+    <div className={`bg-white p-6 rounded-lg shadow-md border-l-4 ${color}`}>
+        <h3 className="text-gray-500 text-sm font-medium uppercase">{title}</h3>
+        <p className="text-3xl font-bold text-gray-800">{value}</p>
+    </div>
+);
 
 const SAProjects = () => {
+    const [stats, setStats] = useState(null);
+    const [projectHours, setProjectHours] = useState([]);
+    const [employeeHours, setEmployeeHours] = useState([]);
+    const [isDashboardLoading, setIsDashboardLoading] = useState(true);
+
     const [projects, setProjects] = useState([]);
     const [allDisciplines, setAllDisciplines] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -10,6 +35,28 @@ const SAProjects = () => {
     const [currentProject, setCurrentProject] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [projectManagers, setProjectManagers] = useState([]);
+
+
+    useEffect(() => {
+        const fetchDashboardData = async () => {
+            try {
+                // Fetch all dashboard data concurrently
+                const [statsRes, projHrsRes, empHrsRes] = await Promise.all([
+                    api.get('/dashboard/stats'),        // Assumes you created this endpoint
+                    api.get('/dashboard/hours-by-project'),
+                    api.get('/dashboard/hours-by-employee')
+                ]);
+                setStats(statsRes.data);
+                setProjectHours(projHrsRes.data);
+                setEmployeeHours(empHrsRes.data);
+            } catch (error) {
+                console.error("Failed to fetch dashboard data:", error);
+            }
+            setIsDashboardLoading(false);
+        };
+        fetchDashboardData();
+    }, []);
+
 
     useEffect(() => {
         fetchData();
@@ -75,7 +122,7 @@ const SAProjects = () => {
         const projectData = {
             name: currentProject.name,
             clientName: currentProject.clientName,
-            disciplineIds: currentProject.disciplineIds,
+            // disciplineIds: currentProject.disciplineIds,
             projectManagerId: currentProject.projectManagerId,
         };
 
@@ -113,11 +160,21 @@ const SAProjects = () => {
     };
 
     if (isLoading) return <div className="p-8">Loading projects...</div>;
+    if (isDashboardLoading) return <div className="p-8">Loading Dashboard Analytics...</div>;
 
     return (
         <div className="p-8">
+            <h1 className="text-3xl font-bold mb-6">Projects Dashboard</h1>
+            <div className="p-6 bg-gray-100">
+                {/* KPI Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    <StatCard title="Total Projects" value={stats?.totalProjects || 0} color="border-blue-500" />
+                    <StatCard title="Total Employees" value={stats?.totalEmployees || 0} color="border-green-500" />
+                    <StatCard title="Total Departments" value={stats?.totalDepartments || 0} color="border-purple-500" />
+                </div>
+            </div>
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold">All Projects</h1>
+                <h5 className="text-3xl font-bold">All Projects</h5>
                 <button onClick={() => handleOpenModal()} className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">Add Project</button>
             </div>
 
@@ -162,7 +219,7 @@ const SAProjects = () => {
                                 <label className="block text-gray-700 text-sm font-bold mb-2">Client Name</label>
                                 <input type="text" name="clientName" value={currentProject.clientName} onChange={handleInputChange} className="w-full p-2 border rounded" />
                             </div>
-                            <div className="mb-6">
+                            {/* <div className="mb-6">
                                 <label className="block text-gray-700 text-sm font-bold mb-2">Assign Disciplines</label>
                                 <Select
                                     isMulti
@@ -171,7 +228,7 @@ const SAProjects = () => {
                                     value={allDisciplines.filter(opt => currentProject.disciplineIds.includes(opt.value))}
                                     className="text-black"
                                 />
-                            </div>
+                            </div> */}
                             <div className="mb-6">
                                 <label className="block text-gray-700 text-sm font-bold mb-2">Project Manager</label>
                                 <Select

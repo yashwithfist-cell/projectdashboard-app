@@ -1,18 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import api from '../utils/api';
-import { 
-    BarChart, 
-    Bar, 
-    XAxis, 
-    YAxis, 
-    CartesianGrid, 
-    Tooltip, 
-    Legend, 
-    ResponsiveContainer, 
-    PieChart, 
-    Pie, 
-    Cell 
+import {
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    Legend,
+    ResponsiveContainer,
+    PieChart,
+    Pie,
+    Cell
 } from 'recharts';
+import { getAllEmployees } from "../services/employeeservice";
+// import { getAllTimeLines } from '../services/timelineservice';
+import { Link } from "react-router-dom";
 
 // A simple component for the stat cards
 const StatCard = ({ title, value, color }) => (
@@ -27,6 +30,10 @@ const SADashboard = () => {
     const [projectHours, setProjectHours] = useState([]);
     const [employeeHours, setEmployeeHours] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [employees, setEmployees] = useState([]);
+    const [projects, setProjects] = useState([]);
+    const [timeLines, setTimeLines] = useState({});
+
 
     useEffect(() => {
         const fetchDashboardData = async () => {
@@ -40,6 +47,8 @@ const SADashboard = () => {
                 setStats(statsRes.data);
                 setProjectHours(projHrsRes.data);
                 setEmployeeHours(empHrsRes.data);
+                getAllEmployees().then(res => setEmployees(res.data.data)).catch(err => console.error(err));
+                // getAllTimeLines().then(res => setTimeLines(res.data.data)).catch(err => console.error(err));
             } catch (error) {
                 console.error("Failed to fetch dashboard data:", error);
             }
@@ -92,11 +101,47 @@ const SADashboard = () => {
                                 ))}
                             </Pie>
                             <Tooltip formatter={(value) => `${value.toFixed(2)} hours`} />
-                            <Legend />
+                            {/* <Legend /> */}
                         </PieChart>
                     </ResponsiveContainer>
                 </div>
             </div>
+
+
+            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-800 border-b border-gray-700">
+                        <tr>
+                            <th className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white">
+                                Employee Timeline Summary
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody className="bg-white divide-y divide-gray-200">
+                        {employeeHours.map((employee) => (
+                            <tr key={employee.employeeId}>
+                                {/* <td className="px-6 py-4">{project.name}</td> */}
+                                <td className="px-6 py-4">
+                                    <Link
+                                        to={`/saemptimeline/${employee.employeeId}`}
+                                        className="text-blue-600 hover:underline font-semibold"
+                                    >
+                                        {employee.name}
+                                    </Link>
+                                </td>
+                                {/* <td className="px-6 py-4">{project.clientName || 'N/A'}</td> */}
+                                {/* <td className="px-6 py-4 font-bold">{formatHours(project.hoursConsumed)}</td> */}
+                                {/* <td className="px-6 py-4 text-center">
+                                    <button onClick={() => handleOpenModal(project)} className="bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-bold py-1 px-3 rounded-md mr-2">Edit</button>
+                                    <button onClick={() => handleDelete(project.id)} className="bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-1 px-3 rounded-md">Delete</button>
+                                </td> */}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
         </div>
     );
 };

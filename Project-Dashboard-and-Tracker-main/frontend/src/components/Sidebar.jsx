@@ -6,7 +6,8 @@ import { useAuth } from "../context/AuthContext";
 const navItemsAdmin = [
   { label: "Dashboard", path: "/sadashboard" },
   { label: "Projects", path: "/saprojects" },
-  { label: "Milestone", path: "/samilestones" },
+  // { label: "Milestone", path: "/samilestones" },
+  // { label: "Discipline", path: "/sadisciplines" },
   { label: "Employees", path: "/saemployees" },
   { label: "MasterData", path: "/masterdatareport" },
   { label: "MilestoneReport", path: "/milestonedatareport" },
@@ -17,6 +18,7 @@ const navItemsAdmin = [
 
 const navItemsHr = [
   { label: "Dashboard", path: "/hrdashboard" },
+  { label: "Projects", path: "/hrprojects" },
   { label: "Employees", path: "/hremployees" },
   { label: "Leave Approval", path: "/hrleaveapproval" },
   { label: "Attendance Log", path: "/hrattendancelog" },

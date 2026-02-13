@@ -8,45 +8,81 @@ const SAMilestones = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
-    const [currentMilestone, setCurrentMilestone] = useState(null);
+    const [currentMilestone, setCurrentMilestone] = useState({
+        projectId: "",
+        disciplineId: "",
+        parentMilestoneId: "",
+        name: "",
+        dueDate: ""
+    });
+    const [disciplines, setDisciplines] = useState([]);
+    const [milestoneOptions, setMilestoneOptions] = useState([]);
 
     const { activeUser } = useAuth();
     const role = activeUser?.role || "";
 
     // Fetch all necessary data when the component first loads
     useEffect(() => {
-        fetchData();
+        fetchProjects();
     }, []);
 
-    const fetchData = async () => {
+    const fetchProjects = async () => {
         setIsLoading(true);
         try {
-            // Fetch milestones with hours and the simple project list concurrently
-            const projectsRes = (role === "PROJECT_MANAGER")
-                ? await api.get('/projects/getAllByUser', { withCredentials: true })
-                : await api.get('/projects/list');
-
-            setProjects(projectsRes.data);
-
-            // ✅ FIX IS RIGHT HERE
-            const projectIds = projectsRes.data.map(project => project.id);
-
-            const milestonesRes = (role === "PROJECT_MANAGER")
-                ? await api.post('/milestones/getUserMilestones', projectIds)
-                : await api.get('/milestones');
-
-
-            // const [milestonesRes, projectsRes] = await Promise.all([
-            //     api.get(milestoneUrl),
-            //     api.get(projectUrl)
-            // ]);
-            setMilestones(milestonesRes.data);
-
+            const projectRes = await api.get("/projects/list");
+            setProjects(projectRes.data);
+             const milestoneRes = await api.get("/milestones/getAllMilestones");
+            setMilestones(milestoneRes.data);
         } catch (err) {
             console.error('Failed to fetch data:', err);
         }
         setIsLoading(false);
     };
+
+    const handleProjectChange = async (e) => {
+    const projectId = e.target.value;
+
+    setCurrentMilestone({
+      projectId,
+      disciplineId: "",
+      parentMilestoneId: "",
+      name: "",
+      dueDate: ""
+    });
+
+    setDisciplines([]);
+    setMilestoneOptions([]);
+
+    if (!projectId) return;
+
+    try {
+      const res = await api.get(`/disciplines/getDisciplineByProjId/${projectId}`);
+      setDisciplines(res.data);
+    } catch (err) {
+      console.error("Failed to fetch disciplines", err);
+    }
+  };
+
+  const handleDisciplineChange = async (e) => {
+    const disciplineId = e.target.value;
+
+    setCurrentMilestone(prev => ({
+      ...prev,
+      disciplineId,
+      parentMilestoneId: ""
+    }));
+
+    setMilestoneOptions([]);
+
+    if (!disciplineId) return;
+
+    try {
+      const res = await api.get(`/milestones/getMilestonesByDiscId/${disciplineId}`);
+      setMilestoneOptions(res.data);
+    } catch (err) {
+      console.error("Failed to fetch milestones", err);
+    }
+  };
 
     // --- MODAL AND FORM HANDLING ---
 
@@ -82,6 +118,7 @@ const SAMilestones = () => {
             name: currentMilestone.name,
             dueDate: currentMilestone.dueDate,
             projectId: currentMilestone.projectId,
+            disciplineId: currentMilestone.disciplineId
         };
 
         try {
@@ -90,7 +127,7 @@ const SAMilestones = () => {
             } else {
                 await api.post('/milestones', milestoneData);
             }
-            fetchData(); // Refresh the list with new data
+            fetchProjects(); // Refresh the list with new data
             handleCloseModal();
         } catch (error) {
             console.error("Failed to save milestone:", error);
@@ -150,6 +187,7 @@ const SAMilestones = () => {
                             </h3>
                             <div className="text-sm text-gray-600 space-y-2">
                                 <p><strong className="w-24 inline-block">Project:</strong> {milestone.projectName || "N/A"}</p>
+                                <p><strong className="w-24 inline-block">Discipline:</strong> {milestone.disciplineDTO.name || "N/A"}</p>
                                 <p><strong className="w-24 inline-block">Due Date:</strong> {formatDate(milestone.dueDate)}</p>
                                 <p className="font-bold text-gray-800">
                                     <strong className="w-24 inline-block font-semibold text-gray-600">Hours Used:</strong>
@@ -173,9 +211,30 @@ const SAMilestones = () => {
                     <div className="bg-white p-8 rounded-lg w-full max-w-md">
                         <h3 className="text-2xl font-bold mb-6">{isEditMode ? 'Edit Milestone' : 'Add New Milestone'}</h3>
                         <form onSubmit={handleSubmit} className="space-y-4">
-                            <select name="projectId" value={currentMilestone?.projectId || ''} onChange={handleInputChange} className="w-full p-2 border rounded" required>
-                                <option value="">Select a Project</option>
-                                {projects.map(p => (<option key={p.id} value={p.id}>{p.name}</option>))}
+                            <select
+                                name="projectId"
+                                value={currentMilestone.projectId}
+                                onChange={handleProjectChange}
+                                className="w-full p-2 border rounded"
+                                required
+                            >
+                                <option value="">Select Project</option>
+                                {projects.map(p => (
+                                    <option key={p.id} value={p.id}>{p.name}</option>
+                                ))}
+                            </select>
+                            <select
+                                name="disciplineId"
+                                value={currentMilestone.disciplineId}
+                                onChange={handleDisciplineChange}
+                                className="w-full p-2 border rounded"
+                                disabled={!currentMilestone.projectId}
+                                required
+                            >
+                                <option value="">Select Discipline</option>
+                                {disciplines.map(d => (
+                                    <option key={d.id} value={d.id}>{d.name}</option>
+                                ))}
                             </select>
                             <input type="text" name="name" value={currentMilestone?.name || ''} onChange={handleInputChange} placeholder="Milestone Name" className="w-full p-2 border rounded" required />
                             <div>

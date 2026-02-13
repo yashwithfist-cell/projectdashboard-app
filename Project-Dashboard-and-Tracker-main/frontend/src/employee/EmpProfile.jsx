@@ -50,11 +50,11 @@ export default function EmpProfile() {
           <InfoItem icon={<FaEnvelope />} label="Email" value={employee.mailId} />
           <InfoItem icon={<FaPhone />} label="Phone Number" value={employee.contactNo} />
           <InfoItem icon={<FaBriefcase />} label="Department" value={employee.departmentName} />
-          <InfoItem
+          {/* <InfoItem
             icon={<FaCalendarAlt />}
             label="Date Of Birth"
             value={new Date(employee.dateOfBirth).toLocaleDateString()}
-          />
+          /> */}
           <InfoItem
             icon={<FaCalendarAlt />}
             label="Joining Date"

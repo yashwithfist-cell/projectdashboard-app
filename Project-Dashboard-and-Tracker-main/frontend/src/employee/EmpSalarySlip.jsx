@@ -61,12 +61,26 @@ export default function EmpSalarySlip() {
         Salary Slip
       </h2>
 
-      <div className="mb-4">
+      {/* <div className="mb-4">
         <label className="block text-gray-700 font-semibold mb-1">Select Month</label>
         <input
           type="month"
           value={date}
           onChange={(e) => setDate(e.target.value)}
+          max={maxMonth()}
+          className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+        />
+      </div> */}
+      <div className="mb-4">
+        <label className="block text-gray-700 font-semibold mb-1">
+          Select Month
+        </label>
+
+        <input
+          type="month"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          min="2026-01"        // ⬅ disables till 2025 Dec
           max={maxMonth()}
           className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
         />

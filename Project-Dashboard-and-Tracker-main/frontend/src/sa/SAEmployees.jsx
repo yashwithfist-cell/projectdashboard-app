@@ -22,6 +22,7 @@ const EmployeeDetailModal = ({ employee, onClose }) => {
 
           <div className="space-y-4">
             <div className="flex justify-between"><span className="font-semibold text-gray-600">Employee ID:</span> <span className="font-mono bg-gray-100 px-2 py-1 rounded">{employee.employeeId}</span></div>
+            <div className="flex justify-between"><span className="font-semibold text-gray-600">Employee Device Code:</span> <span className="font-mono bg-gray-100 px-2 py-1 rounded">{employee.empDeviceCode}</span></div>
             <div className="flex justify-between"><span className="font-semibold text-gray-600">Name:</span> <span>{employee.name}</span></div>
             <div className="flex justify-between"><span className="font-semibold text-gray-600">Username:</span> <span className="font-mono">{employee.username}</span></div>
             <div className="flex justify-between"><span className="font-semibold text-gray-600">Department:</span> <span>{employee.departmentName || 'N/A'}</span></div>
@@ -75,7 +76,8 @@ const SAEmployees = () => {
     profPeriodEndDate: '',
     mailId: '',
     managerName: '',
-    leadName: ''
+    leadName: '',
+    empDeviceCode: ''
   });
 
   // SIMPLIFIED state for editing an employee
@@ -92,7 +94,8 @@ const SAEmployees = () => {
     profPeriodEndDate: '',
     mailId: '',
     managerName: '',
-    leadName: ''
+    leadName: '',
+    empDeviceCode: ''
   });
 
   useEffect(() => {
@@ -159,7 +162,7 @@ const SAEmployees = () => {
       await addEmployee(newEmployee);
       setShowAddModal(false);
       setNewEmployee({
-        employeeId: '', name: '', departmentId: '', role: 'EMPLOYEE', username: '', password: '', joinDate: '', bankAccountNo: '', bankName: '', salary: '', location: '', profPeriodEndDate: '', mailId: '', managerName: '', leadName: ''
+        employeeId: '', name: '', departmentId: '', role: 'EMPLOYEE', username: '', password: '', joinDate: '', bankAccountNo: '', bankName: '', salary: '', location: '', profPeriodEndDate: '', mailId: '', managerName: '', leadName: '', empDeviceCode: ''
       });
       fetchEmployees();
     } catch (err) {
@@ -182,7 +185,8 @@ const SAEmployees = () => {
       profPeriodEndDate: employee.profPeriodEndDate || '',
       mailId: employee.mailId || '',
       managerName: employee.managerName || '',
-      leadName: employee.leadName || ''
+      leadName: employee.leadName || '',
+      empDeviceCode: employee.empDeviceCode || ''
     });
     setShowEditModal(true);
   };
@@ -203,7 +207,8 @@ const SAEmployees = () => {
       profPeriodEndDate: editEmployee.profPeriodEndDate || '',
       mailId: editEmployee.mailId || '',
       managerName: editEmployee.managerName || '',
-      leadName: editEmployee.leadName || ''
+      leadName: editEmployee.leadName || '',
+      empDeviceCode: editEmployee.empDeviceCode || ''
     };
     try {
       await updateEmployee(editEmployee.employeeId, employeeDataToUpdate);
@@ -295,6 +300,7 @@ const SAEmployees = () => {
             <h3 className="text-2xl font-bold mb-6">Add New Employee</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <input type="text" name="employeeId" placeholder="Employee ID *" value={newEmployee.employeeId} onChange={handleChange} required className="w-full px-2 py-1.5 border rounded-md text-sm" />
+              <input type="text" name="empDeviceCode" placeholder="Employee Device Code *" value={newEmployee.empDeviceCode} onChange={handleChange} required={newEmployee.role == "EMPLOYEE"} className="w-full px-2 py-1.5 border rounded-md text-sm" />
               <input type="text" name="name" placeholder="Employee Name *" value={newEmployee.name} onChange={handleChange} required className="w-full px-2 py-1.5 border rounded-md text-sm" />
               <input type="text" name="username" placeholder="Username *" value={newEmployee.username} onChange={handleChange} required className="w-full px-2 py-1.5 border rounded-md text-sm" />
               <input type="password" name="password" placeholder="Password *" value={newEmployee.password} onChange={handleChange} required className="w-full px-2 py-1.5 border rounded-md text-sm" />
@@ -327,33 +333,33 @@ const SAEmployees = () => {
               <input
                 type={newEmployee.joinDate ? "date" : "text"}
                 name="joinDate"
-                placeholder="Join Date *"
+                placeholder="Join Date"
                 value={newEmployee.joinDate}
                 onFocus={(e) => (e.target.type = "date")}
                 onBlur={(e) => {
                   if (!newEmployee.joinDate) e.target.type = "text";
                 }}
                 onChange={handleChange}
-                required
+                required={newEmployee.role == "EMPLOYEE"}
                 className="w-full px-2 py-1.5 border rounded-md text-sm"
               />
 
-              <input type="text" name="bankAccountNo" placeholder="Bank Account No *" value={newEmployee.bankAccountNo} onChange={handleChange} required className="w-full px-2 py-1.5 border rounded-md text-sm" />
-              <input type="text" name="bankName" placeholder="Bank Name *" value={newEmployee.bankName} onChange={handleChange} required className="w-full px-2 py-1.5 border rounded-md text-sm" />
-              <input type="text" name="location" placeholder="Address *" value={newEmployee.location} onChange={handleChange} required className="w-full px-2 py-1.5 border rounded-md text-sm" />
-              <input type="text" name="salary" placeholder="Salary *" value={newEmployee.salary} onChange={handleChange} required className="w-full px-2 py-1.5 border rounded-md text-sm" />
-              <input type="text" name="mailId" placeholder="Email ID *" value={newEmployee.mailId} onChange={handleChange} required className="w-full px-2 py-1.5 border rounded-md text-sm" />
+              <input type="text" name="bankAccountNo" placeholder="Bank Account No *" value={newEmployee.bankAccountNo} onChange={handleChange} required={newEmployee.role == "EMPLOYEE"} className="w-full px-2 py-1.5 border rounded-md text-sm" />
+              <input type="text" name="bankName" placeholder="Bank Name *" value={newEmployee.bankName} onChange={handleChange} required={newEmployee.role == "EMPLOYEE"} className="w-full px-2 py-1.5 border rounded-md text-sm" />
+              <input type="text" name="location" placeholder="Address *" value={newEmployee.location} onChange={handleChange} required={newEmployee.role == "EMPLOYEE"} className="w-full px-2 py-1.5 border rounded-md text-sm" />
+              <input type="text" name="salary" placeholder="Salary *" value={newEmployee.salary} onChange={handleChange} required={newEmployee.role == "EMPLOYEE"} className="w-full px-2 py-1.5 border rounded-md text-sm" />
+              <input type="text" name="mailId" placeholder="Email ID *" value={newEmployee.mailId} onChange={handleChange} required={newEmployee.role == "EMPLOYEE"} className="w-full px-2 py-1.5 border rounded-md text-sm" />
               <input
                 type={newEmployee.profPeriodEndDate ? "date" : "text"}
                 name="profPeriodEndDate"
-                placeholder="Probation Period End Date *"
+                placeholder="Probation Period End Date"
                 value={newEmployee.profPeriodEndDate}
                 onFocus={(e) => (e.target.type = "date")}
                 onBlur={(e) => {
                   if (!newEmployee.profPeriodEndDate) e.target.type = "text";
                 }}
                 onChange={handleChange}
-                required
+                required={newEmployee.role == "EMPLOYEE"}
                 className="w-full px-2 py-1.5 border rounded-md text-sm"
               />
 
@@ -363,6 +369,7 @@ const SAEmployees = () => {
                   value={newEmployee.managerName}
                   onChange={handleChange}
                   className={`w-full px-2 py-1.5 border rounded-md text-sm`}
+                  required={newEmployee.role == "EMPLOYEE"}
                 >
                   <option value="">Select Project Manager</option>
                   {managers.map((m) => (
@@ -382,6 +389,7 @@ const SAEmployees = () => {
                   value={newEmployee.leadName}
                   onChange={handleChange}
                   className={`w-full px-2 py-1.5 border rounded-md text-sm`}
+                  required={newEmployee.role == "EMPLOYEE"}
                 >
                   <option value="">Select Team Lead</option>
                   {teamleads.map((t) => (
@@ -413,8 +421,9 @@ const SAEmployees = () => {
                     salary: '',
                     profPeriodEndDate: '',
                     mailId: '',
-                    managerName:'',
-                    leadName:''
+                    managerName: '',
+                    leadName: '',
+                    empDeviceCode: ''
                   });
                 }} className="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">Cancel</button>
                 <button type="submit" className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Add Employee</button>
@@ -431,6 +440,7 @@ const SAEmployees = () => {
             <h3 className="text-xl font-bold mb-4">Edit Employee</h3>
             <form onSubmit={handleEditSubmit} className="space-y-4">
               <input type="text" name="employeeId" value={editEmployee.employeeId} disabled className="w-full px-3 py-2 border rounded-md bg-gray-100" />
+              <input type="text" name="empDeviceCode" placeholder="Employee Device Code *" value={editEmployee.empDeviceCode} onChange={handleEditChange} required={newEmployee.role == "EMPLOYEE"} className="w-full px-3 py-2 border rounded-md" />
               <input type="text" name="name" placeholder="Employee Name" value={editEmployee.name} onChange={handleEditChange} required className="w-full px-3 py-2 border rounded-md" />
               <select name="departmentId" value={editEmployee.departmentId} onChange={handleEditChange} required className="w-full px-3 py-2 border rounded-md">
                 <option value="">Select Department</option>
@@ -458,41 +468,42 @@ const SAEmployees = () => {
               <input
                 type={editEmployee.joinDate ? "date" : "text"}
                 name="joinDate"
-                placeholder="Join Date *"
+                placeholder="Join Date"
                 value={editEmployee.joinDate}
                 onFocus={(e) => (e.target.type = "date")}
                 onBlur={(e) => {
                   if (!editEmployee.joinDate) e.target.type = "text";
                 }}
                 onChange={handleEditChange}
-                required
+                required={editEmployee.role == "EMPLOYEE"}
                 className="w-full px-3 py-2 border rounded-md"
               />
 
-              <input type="text" name="bankAccountNo" placeholder="Bank Account No *" value={editEmployee.bankAccountNo} onChange={handleEditChange} required className="w-full px-3 py-2 border rounded-md" />
-              <input type="text" name="bankName" placeholder="Bank Name *" value={editEmployee.bankName} onChange={handleEditChange} required className="w-full px-3 py-2 border rounded-md" />
-              <input type="text" name="location" placeholder="Address *" value={editEmployee.location} onChange={handleEditChange} required className="w-full px-3 py-2 border rounded-md" />
-              <input type="number" name="salary" placeholder="Salary *" value={editEmployee.salary} onChange={handleEditChange} required className="w-full px-3 py-2 border rounded-md" />
-              <input type="text" name="mailId" placeholder="Email ID *" value={editEmployee.mailId} onChange={handleEditChange} required className="w-full px-3 py-2 border rounded-md" />
+              <input type="text" name="bankAccountNo" placeholder="Bank Account No *" value={editEmployee.bankAccountNo} onChange={handleEditChange} required={editEmployee.role == "EMPLOYEE"} className="w-full px-3 py-2 border rounded-md" />
+              <input type="text" name="bankName" placeholder="Bank Name *" value={editEmployee.bankName} onChange={handleEditChange} required={editEmployee.role == "EMPLOYEE"} className="w-full px-3 py-2 border rounded-md" />
+              <input type="text" name="location" placeholder="Address *" value={editEmployee.location} onChange={handleEditChange} required={editEmployee.role == "EMPLOYEE"} className="w-full px-3 py-2 border rounded-md" />
+              <input type="number" name="salary" placeholder="Salary *" value={editEmployee.salary} onChange={handleEditChange} required={editEmployee.role == "EMPLOYEE"} className="w-full px-3 py-2 border rounded-md" />
+              <input type="text" name="mailId" placeholder="Email ID *" value={editEmployee.mailId} onChange={handleEditChange} required={editEmployee.role == "EMPLOYEE"} className="w-full px-3 py-2 border rounded-md" />
               <input
                 type={editEmployee.profPeriodEndDate ? "date" : "text"}
                 name="profPeriodEndDate"
-                placeholder="Probation Period End Date *"
+                placeholder="Probation Period End Date"
                 value={editEmployee.profPeriodEndDate}
                 onFocus={(e) => (e.target.type = "date")}
                 onBlur={(e) => {
                   if (!editEmployee.profPeriodEndDate) e.target.type = "text";
                 }}
                 onChange={handleEditChange}
-                required
+                required={editEmployee.role == "EMPLOYEE"}
                 className="w-full px-3 py-2 border rounded-md"
               />
-                     <div>
+              <div>
                 <select
                   name="managerName"
                   value={editEmployee.managerName}
                   onChange={handleEditChange}
                   className={`w-full border p-2 rounded-md`}
+                  required={editEmployee.role == "EMPLOYEE"}
                 >
                   <option value="">Select Project Manager</option>
                   {managers.map((m) => (
@@ -512,6 +523,7 @@ const SAEmployees = () => {
                   value={editEmployee.leadName}
                   onChange={handleEditChange}
                   className={`w-full border p-2 rounded-md`}
+                  required={editEmployee.role == "EMPLOYEE"}
                 >
                   <option value="">Select Team Lead</option>
                   {teamleads.map((t) => (

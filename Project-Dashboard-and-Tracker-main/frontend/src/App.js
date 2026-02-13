@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { HashRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext.js";
 
 // Import Pages
@@ -28,6 +28,11 @@ import MgrProjAssignment from "./projectmanager/MgrProjAssignment.jsx";
 import EmpProjAssignment from "./employee/EmpProjAssignment.jsx";
 import MgrProjects from "./projectmanager/MgrProjects.jsx";
 import EmpProfile from "./employee/EmpProfile.jsx";
+import SADisciplines from "./sa/SADisciplines.jsx";
+import SuperAdminProjects from "./superadmin/SuperAdminProjects.jsx";
+import SuperAdminMilestones from "./superadmin/SuperAdminMilestones.jsx";
+import SuperAdminDisciplines from "./superadmin/SuperAdminDisciplines.jsx";
+import SAEmpTimeine from "./sa/SAEmpTimeline.jsx";
 
 
 // 🔒 NEW — Protected Route for Multi-User
@@ -74,8 +79,9 @@ function AppContent() {
           }
         >
           <Route path="/sadashboard" element={<SADashboard />} />
-          <Route path="/saprojects" element={<SAProjects />} />
-          <Route path="/samilestones" element={<SAMilestones />} />
+          <Route path="/saprojects" element={<SuperAdminProjects />} />
+          {/* <Route path="/samilestones" element={<SAMilestones />} /> */}
+          {/* <Route path="/sadisciplines" element={<SADisciplines />} /> */}
           <Route path="/saemployees" element={<SAEmployees />} />
           <Route path="/masterdatareport" element={<MasterDataReport />} />
           <Route path="/milestonedatareport" element={<MilestoneDataReport />} />
@@ -87,12 +93,17 @@ function AppContent() {
           <Route path="/tlnotification" element={<EmpNotification />} />
           <Route path="/mgrprojassignment" element={<MgrProjAssignment />} />
           <Route path="/mgrprojects" element={<MgrProjects />} />
+           <Route path="/hrprojects" element={<SuperAdminProjects />} />
           <Route path="/hremployees" element={<SAEmployees />} />
           <Route path="/hrdashboard" element={<SADashboard />} />
           <Route path="/hrleaveapproval" element={<SALeaveApproval />} />
           <Route path="/hrattendancelog" element={<SAAttendanceLog />} />
           <Route path="/hrsystemlog" element={<SASystemLog />} />
           <Route path="/hrnotification" element={<EmpNotification />} />
+          <Route path="/superadminprojects" element={<SuperAdminProjects />} />
+          <Route path="/superadminmilestones/:projectId" element={<SuperAdminMilestones />} />
+          <Route path="/superadmindisciplines/:projectId" element={<SuperAdminDisciplines />} />
+          <Route path="/saemptimeline/:employeeId" element={<SAEmpTimeine />} />
         </Route>
 
         {/* EMPLOYEE ROUTES */}

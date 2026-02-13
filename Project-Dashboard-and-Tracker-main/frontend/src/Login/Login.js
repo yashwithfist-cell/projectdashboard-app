@@ -17,7 +17,14 @@ function Login({ onLoginSuccess }) {
   try {
     const credentials = btoa(`${username}:${password}`);
 
-    const res = await fetch("http://localhost:8080/user", {
+    // const res = await fetch("http://localhost:8091/user", {
+    //   method: "GET",
+    //   headers: {
+    //     Authorization: `Basic ${credentials}`,
+    //   },
+    // });
+
+    const res = await fetch("http://192.168.1.34:8080/user", {
       method: "GET",
       headers: {
         Authorization: `Basic ${credentials}`,
