@@ -57,7 +57,7 @@ export default function EmpProfile() {
           /> */}
           <InfoItem
             icon={<FaCalendarAlt />}
-            label="Joining Date"
+            label="Join Date"
             value={new Date(employee.joinDate).toLocaleDateString()}
           />
           <InfoItem
