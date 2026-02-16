@@ -84,7 +84,8 @@
       {
         "provider": "github",
         "owner": "yashwithfist-cell",
-        "repo": "projectdashboard-app"
+        "repo": "projectdashboard-app",
+         "releaseType": "release"
       }
     ]
   },
