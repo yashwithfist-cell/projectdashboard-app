@@ -1,6 +1,6 @@
 {
   "name": "project-dashboard",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "private": true,
   "type": "module",
   "main": "main.js",
@@ -10,9 +10,7 @@
     "electron:dev": "cross-env NODE_ENV=development electron .",
     "dev": "concurrently \"npm run start\" \"npm run electron:dev\"",
     "frontend-build": "react-scripts build",
-    "electron-build": "electron-builder --win --publish always",
-    "build": "npm run frontend-build && npm run electron-build",
-    "dist": "npm run build && electron-builder",
+    "electron-build": "npm run frontend-build && electron-builder --win --publish always",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -80,14 +78,12 @@
     "extraMetadata": {
       "main": "main.js"
     },
-    "publish": [
-      {
-        "provider": "github",
-        "owner": "yashwithfist-cell",
-        "repo": "projectdashboard-app",
-         "releaseType": "release"
-      }
-    ]
+    "publish": {
+      "provider": "github",
+      "owner": "yashwithfist-cell",
+      "repo": "projectdashboard-app",
+      "releaseType": "release"
+    }
   },
   "author": "Your Name",
   "description": "Project Dashboard Electron app with React frontend"
