@@ -34,7 +34,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }) {
     { label: "Leaves", path: "/employeeleave", icon: <FaCalendarAlt className="text-green-600 hover:scale-110 duration-200" /> },
     { label: "Attendance Log", path: "/empattendancelog", icon: <FaClock className="text-orange-600 hover:scale-110 duration-200" /> },
     { label: "Salary Slip", path: "/empsalaryslip", icon: <FaFileInvoice className="text-indigo-600 hover:scale-110 duration-200" /> },
-    { label: "SystemLog", path: "/empsystemlog", icon: <FaChartLine className="text-teal-600 hover:scale-110 duration-200" /> },
+    // { label: "SystemLog", path: "/empsystemlog", icon: <FaChartLine className="text-teal-600 hover:scale-110 duration-200" /> },
     // { label: "Notifications", path: "/empnotification", icon: <FaBell className="text-yellow-500 hover:scale-110 duration-200" /> },
     {
       label: (
