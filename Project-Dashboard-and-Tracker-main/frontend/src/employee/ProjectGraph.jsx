@@ -21,7 +21,11 @@ export default function ProjectGraph({
   const PROJECT_PALETTE = ["#3B82F6", "#09d4f8", "#f70fbd", "#a684f7", "#F97316", "#fce307"];
 
   // const [currentPage, setCurrentPage] = useState(1);
-  const [currentPage, setCurrentPage] = useState(1);
+  // const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(() => {
+    const saved = parseInt(localStorage.getItem("timelineCurrentPage"), 10);
+    return !isNaN(saved) && saved > 0 ? saved : 1;
+  });
   const [today, setToday] = useState('');
 
   useEffect(() => {
@@ -34,12 +38,13 @@ export default function ProjectGraph({
   }, []);
 
 
-  useEffect(() => {
-    const saved = parseInt(localStorage.getItem("timelineCurrentPage"), 10);
-    if (!isNaN(saved)) {
-      setCurrentPage(saved);
-    }
-  }, []);
+  // useEffect(() => {
+  //   const saved = parseInt(localStorage.getItem("timelineCurrentPage"), 10);
+  //   if (!isNaN(saved)) {
+  //     setCurrentPage(saved);
+  //   }
+  // }, []);
+
   const ROWS_PER_PAGE = 10;
 
   const [comments, setComments] = useState({});
@@ -282,6 +287,14 @@ export default function ProjectGraph({
     return buildTimelineTableRows();
   }, [checkIns, checkOuts, idleLogs, logs]);
 
+  useEffect(() => {
+    const totalPages = Math.ceil(tableRows.length / ROWS_PER_PAGE) || 1;
+
+    if (currentPage > totalPages) {
+      setCurrentPage(1);
+    }
+  }, [tableRows, currentPage]);
+
 
   const summaryHoursData = useMemo(() => {
     const summaryMap = {
@@ -307,10 +320,19 @@ export default function ProjectGraph({
   }, [summaryHoursData, setSummaryHoursData]);
 
   // -------- Pagination Logic --------
-  const totalPages = Math.ceil(tableRows.length / ROWS_PER_PAGE);
-  const startIdx = (currentPage - 1) * ROWS_PER_PAGE;
+  // const totalPages = Math.ceil(tableRows.length / ROWS_PER_PAGE);
+  // const startIdx = (currentPage - 1) * ROWS_PER_PAGE;
+  // const endIdx = startIdx + ROWS_PER_PAGE;
+  // const paginatedRows = tableRows.slice(startIdx, endIdx);
+  const totalPages = Math.max(1, Math.ceil(tableRows.length / ROWS_PER_PAGE));
+
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+
+  const startIdx = (safeCurrentPage - 1) * ROWS_PER_PAGE;
   const endIdx = startIdx + ROWS_PER_PAGE;
+
   const paginatedRows = tableRows.slice(startIdx, endIdx);
+
 
   const goToPage = (page) => {
     if (page < 1 || page > totalPages) return;
