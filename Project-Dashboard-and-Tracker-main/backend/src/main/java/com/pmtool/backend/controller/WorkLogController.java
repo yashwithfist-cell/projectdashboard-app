@@ -42,4 +42,12 @@ public class WorkLogController {
         // FIX #2: The body of the response is now the DTO
         return ResponseEntity.status(HttpStatus.CREATED).body(savedEntryDto);
     }
+    
+    @GetMapping("/myDailyWorkLog")
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public ResponseEntity<List<WorkLogResponseDTO>> getMyDailyWorkLogs(Authentication authentication) {
+        String username = authentication.getName();
+        List<WorkLogResponseDTO> worklogs = workLogService.getMyDailyWorkLogs(username);
+        return ResponseEntity.ok(worklogs);
+    }
 }

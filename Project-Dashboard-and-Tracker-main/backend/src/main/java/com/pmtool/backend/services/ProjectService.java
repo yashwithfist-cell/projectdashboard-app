@@ -119,11 +119,16 @@ public class ProjectService {
 			projectList = projectRepository.findAllProjectsByTeamLead(userName);
 		}
 
-		return projectList.stream()
-				.map(project -> ProjectResponseDTO.builder().id(project.getId()).name(project.getName())
-						.clientName(project.getClientName())
-						.hoursConsumed(project.getAssignments().stream().mapToLong(ProjectAssignment::getTotalWorkedSeconds).reduce(0L, Long::sum) / 3600.0).build())
-				.toList();
+		return projectList.stream().map(project -> ProjectResponseDTO.builder().id(project.getId())
+				.name(project.getName()).clientName(project.getClientName()).hoursConsumed(project.getAssignments()
+						.stream().mapToLong(ProjectAssignment::getTotalWorkedSeconds).reduce(0L, Long::sum) / 3600.0)
+				.build()).toList();
+	}
+
+	public ProjectResponseDTO getProjectById(Long projectId) {
+		Project project = projectRepository.findById(projectId)
+				.orElseThrow(() -> new RuntimeException("Project not found"));
+		return ProjectResponseDTO.builder().id(project.getId()).name(project.getName()).build();
 	}
 
 } // <-- The closing brace for the class now correctly goes at the end of the

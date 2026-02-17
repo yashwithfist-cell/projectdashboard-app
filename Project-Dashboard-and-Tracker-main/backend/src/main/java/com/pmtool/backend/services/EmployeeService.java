@@ -40,7 +40,8 @@ public class EmployeeService {
 				.username(dto.getUsername()).password(dto.getPassword()).role(dto.getRole()).department(department)
 				.joinDate(dto.getJoinDate()).bankAccountNo(dto.getBankAccountNo()).bankName(dto.getBankName())
 				.salary(dto.getSalary()).location(dto.getLocation()).profPeriodEndDate(dto.getProfPeriodEndDate())
-				.mailId(dto.getMailId()).mgrName(dto.getManagerName()).teamLeadName(dto.getLeadName()).build();
+				.mailId(dto.getMailId()).mgrName(dto.getManagerName()).teamLeadName(dto.getLeadName())
+				.empDeviceCode(dto.getEmpDeviceCode()).build();
 //        newEmployee.setEmployeeId(dto.getEmployeeId());
 //        newEmployee.setName(dto.getName());
 //        newEmployee.setUsername(dto.getUsername());
@@ -91,6 +92,7 @@ public class EmployeeService {
 		existingEmployee.setMailId(dto.getMailId());
 		existingEmployee.setMgrName(dto.getManagerName());
 		existingEmployee.setTeamLeadName(dto.getLeadName());
+		existingEmployee.setEmpDeviceCode(dto.getEmpDeviceCode());
 
 		// You can add more fields to update here as needed
 
@@ -111,7 +113,8 @@ public class EmployeeService {
 	}
 
 	public EmployeeResponseDTO getEmployeeByUsername(String name) {
-		Employee employee = employeeRepository.findByUsername(name).orElseThrow(()->new EmployeeNotFoundException("Employee Not Found with username : "+name));
+		Employee employee = employeeRepository.findByUsername(name)
+				.orElseThrow(() -> new EmployeeNotFoundException("Employee Not Found with username : " + name));
 		return new EmployeeResponseDTO(employee);
 	}
 

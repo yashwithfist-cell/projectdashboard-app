@@ -14,7 +14,7 @@ import java.io.ByteArrayInputStream;
 
 @RestController
 @RequestMapping("/api/salary-slips")
-@CrossOrigin(origins = "*")
+@CrossOrigin
 public class SalarySlipController {
 
 	@Autowired

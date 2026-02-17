@@ -136,8 +136,9 @@ public class ProjectAssignmentServiceImpl implements ProjectAssignmentService {
 	@Override
 	public List<DisciplineDTO> getDisciplinesByProjAssignId(Long projectId, Authentication authentication) {
 		return projectAssignmentRepo.findDisciplinesByProjAssignId(projectId, authentication.getName()).stream()
-				.map(discipline -> new DisciplineDTO(discipline.getId(), discipline.getName(),
-						discipline.getProject().getId()))
+				.map(discipline -> DisciplineDTO.builder().id(discipline.getId()).name(discipline.getName())
+						.projectId(discipline.getProject().getId()).projectName(discipline.getProject().getName())
+						.build())
 				.collect(Collectors.toList());
 	}
 

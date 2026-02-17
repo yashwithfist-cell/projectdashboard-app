@@ -26,7 +26,10 @@ public class ProjectDataService {
 
 	@Transactional(readOnly = true)
 	public List<ProjectDTO> getAllProjects() {
-		return projectRepository.findAll().stream().map(project -> new ProjectDTO(project.getId(), project.getName()))
+		return projectRepository.findAll().stream().map(project -> new ProjectDTO(project.getId(), project.getName(),
+				project.getDisciplines().stream().map(
+						d -> DisciplineDTO.builder().id(d.getId()).projectId(project.getId()).name(d.getName()).build())
+						.collect(Collectors.toSet())))
 				.collect(Collectors.toList());
 	}
 
@@ -43,8 +46,18 @@ public class ProjectDataService {
 		// This now calls the correct method from DisciplineRepository, fixing your
 		// error
 		return disciplineRepository.findDisciplinesByProjectId(projectId).stream()
-				.map(discipline -> new DisciplineDTO(discipline.getId(), discipline.getName(),
-						discipline.getProject().getId()))
+				.map(discipline -> DisciplineDTO.builder().id(discipline.getId()).name(discipline.getName())
+						.projectId(discipline.getProject().getId()).projectName(discipline.getProject().getName())
+						.build())
+				.collect(Collectors.toList());
+	}
+
+	public List<DisciplineDTO> getDisciplinesByIds(Long projectId, Long milestoneId) {
+		return disciplineRepository.findDisciplinesByProjectIdAndMilestoneId(projectId, milestoneId).stream()
+				.map(discipline -> DisciplineDTO.builder().id(discipline.getId()).name(discipline.getName())
+						.projectId(discipline.getProject().getId()).projectName(discipline.getProject().getName())
+						.milestoneId(discipline.getMilestone().getId())
+						.milestoneName(discipline.getMilestone().getName()).build())
 				.collect(Collectors.toList());
 	}
 

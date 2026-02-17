@@ -5,5 +5,6 @@ public enum Role {
     EMPLOYEE,
     PROJECT_MANAGER,
     TEAM_LEAD,
-    HUMAN_RESOURCE
+    HUMAN_RESOURCE,
+    SUPER_ADMIN
 }

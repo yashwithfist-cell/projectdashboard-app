@@ -1,10 +1,17 @@
 package com.pmtool.backend.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 @Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "worklog_entries")
 public class WorkLogEntry {
 
@@ -38,13 +45,16 @@ public class WorkLogEntry {
     private String description;
 
     @Column(name = "start_time", nullable = false)
-    private LocalTime startTime;
+    private LocalDateTime startTime;
 
-    @Column(name = "end_time", nullable = false)
-    private LocalTime endTime;
+    @Column(name = "end_time")
+    private LocalDateTime endTime;
 
     @Column(name = "hours_worked", nullable = false)
     private Double hoursWorked;
+    
+    @Column(name = "current_project")
+	private boolean currentProject=false;
 
     // Inside your WorkLogEntry.java class
 
@@ -59,98 +69,5 @@ public class WorkLogEntry {
             this.hoursWorked = 0.0;
         }
     }
-
-    public WorkLogEntry() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Employee getEmployee() {
-        return employee;
-    }
-
-    public void setEmployee(Employee employee) {
-        this.employee = employee;
-    }
-
-    public Project getProject() {
-        return project;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
-    }
-
-    public Discipline getDiscipline() {
-        return discipline;
-    }
-
-    public void setDiscipline(Discipline discipline) {
-        this.discipline = discipline;
-    }
-
-    public Milestone getMilestone() {
-        return milestone;
-    }
-
-    public void setMilestone(Milestone milestone) {
-        this.milestone = milestone;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-    public String getTask() {
-        return task;
-    }
-
-    public void setTask(String task) {
-        this.task = task;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public LocalTime getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(LocalTime startTime) {
-        this.startTime = startTime;
-    }
-
-    public LocalTime getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(LocalTime endTime) {
-        this.endTime = endTime;
-    }
-
-    public Double getHoursWorked() {
-        return hoursWorked;
-
-    }
-
-    public void setHoursWorked(Double hoursWorked) {
-        this.hoursWorked = hoursWorked;
-    }
-
 
 }

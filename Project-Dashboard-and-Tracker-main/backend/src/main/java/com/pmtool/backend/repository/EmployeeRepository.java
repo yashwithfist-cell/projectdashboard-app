@@ -20,6 +20,7 @@ public interface EmployeeRepository extends JpaRepository<Employee,String>{
     List<Employee> findByRole(Role role);
     Employee findByEmployeeId(String id);
     Optional <List<Employee>> findByProfPeriodEndDate(LocalDate probDate);
+    Employee findByEmpDeviceCode(String empDeviceCode);
 
 
 

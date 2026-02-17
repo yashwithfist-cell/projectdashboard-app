@@ -2,59 +2,24 @@ package com.pmtool.backend.DTO;
 
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import com.pmtool.backend.entity.Milestone;
 import com.pmtool.backend.entity.ProjectAssignment;
 
+import lombok.Data;
+
+@Data
 public class MilestoneResponseDTO {
 
 	private Long milestoneId;
 	private String milestoneName;
-
-	public void setMilestoneId(Long milestoneId) {
-		this.milestoneId = milestoneId;
-	}
-
 	private String projectName;
 	private LocalDate dueDate;
 	private Double hoursConsumed;
-
-	public void setMilestoneName(String milestoneName) {
-		this.milestoneName = milestoneName;
-	}
-
-	public void setProjectName(String projectName) {
-		this.projectName = projectName;
-	}
-
-	public void setDueDate(LocalDate dueDate) {
-		this.dueDate = dueDate;
-	}
-
-	public void setHoursConsumed(Double hoursConsumed) {
-		this.hoursConsumed = hoursConsumed;
-	}
-
-	public Long getMilestoneId() {
-		return this.milestoneId;
-	}
-
-	public String getMilestoneName() {
-		return this.milestoneName;
-	}
-
-	public String getProjectName() {
-		return this.projectName;
-	}
-
-	public LocalDate getDueDate() {
-		return this.dueDate;
-	}
-
-	public Double getHoursConsumed() {
-		return this.hoursConsumed;
-	}
+	private Set<DisciplineDTO> disciplineSet;
 
 	public MilestoneResponseDTO(Long milestoneId, String milestoneName, String projectName, LocalDate dueDate,
 			Double hoursConsumed) {
@@ -74,11 +39,12 @@ public class MilestoneResponseDTO {
 			this.projectName = milestone.getProject().getName();
 		}
 
-		this.hoursConsumed = Optional.ofNullable(milestone.getProjectAssignments())
-				.orElse(Collections.emptySet())
-		        .stream()
-		        .mapToDouble(ProjectAssignment::getTotalWorkedSeconds)
-		        .sum() / 3600.0;
+		this.hoursConsumed = Optional.ofNullable(milestone.getProjectAssignments()).orElse(Collections.emptySet())
+				.stream().mapToDouble(ProjectAssignment::getTotalWorkedSeconds).sum() / 3600.0;
+//		this.disciplineDTO = DisciplineDTO.builder().id(milestone.getDiscipline().getId())
+//				.name(milestone.getDiscipline().getName()).build();
+		milestone.getDisciplines().stream().map(discipline -> disciplineSet
+				.add(DisciplineDTO.builder().id(discipline.getId()).name(discipline.getName()).build()));
 	}
 
 }

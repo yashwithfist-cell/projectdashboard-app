@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -12,7 +13,7 @@ public class ProjectDTO {
     private String name;
     private String clientName;
     private List<Long> disciplineIds; // Field for discipline IDs
-    private List<DisciplineDTO> disciplines;
+    private Set<DisciplineDTO> disciplines;
     private String projectManagerId;
 
     // --- CONSTRUCTORS ---
@@ -37,6 +38,12 @@ public class ProjectDTO {
         this.name = name;
         this.clientName = clientName;
         this.disciplineIds = disciplineIds;
+    }
+    
+    public ProjectDTO(Long id, String name, Set<DisciplineDTO> disciplines) {
+        this.id = id;
+        this.name = name;
+        this.disciplines = disciplines;
     }
 
     // --- GETTERS AND SETTERS ---

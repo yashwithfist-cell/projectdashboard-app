@@ -4,13 +4,19 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -19,6 +25,7 @@ public class Discipline {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@EqualsAndHashCode.Include
 	private Long id;
 
 	@Column(name = "discipline_name", nullable = false)
@@ -33,5 +40,11 @@ public class Discipline {
 
 	@OneToMany(mappedBy = "discipline", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Set<ProjectAssignment> projectAssignments;
+
+//	@OneToMany(mappedBy = "discipline", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//	private Set<Milestone> milestones;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "milestone_id", referencedColumnName = "id", nullable = false)
+	private Milestone milestone;
 
 }

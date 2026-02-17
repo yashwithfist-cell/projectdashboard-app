@@ -15,9 +15,9 @@ import com.pmtool.backend.services.LeaveService;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/leaves")
+@CrossOrigin
 public class LeaveController {
 
 	@Autowired

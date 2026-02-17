@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface MilestoneRepository extends JpaRepository<Milestone, Long> {
@@ -35,8 +36,17 @@ public interface MilestoneRepository extends JpaRepository<Milestone, Long> {
 			ORDER BY p.name, m.name
 			""")
 	List<MilestoneResponseDTO> findAllWithHoursConsumed();
-	
+
 	@Query("SELECT m FROM Milestone m WHERE m.project.id IN :projectIds")
 	List<Milestone> findMilestonesByProjectIds(@Param("projectIds") List<Long> projectIds);
+
+//	Set<Milestone> findByDiscipline_Id(Long disciplineId);
+	
+//	Set<Milestone> findByProject_IdOrderById(Long projectId);
+	@Query("SELECT DISTINCT m FROM Milestone m " +
+		       "LEFT JOIN FETCH m.disciplines " +
+		       "WHERE m.project.id = :projectId " +
+		       "ORDER BY m.id")
+	List<Milestone> findByProjectWithDisciplines(@Param("projectId") Long projectId);
 
 }

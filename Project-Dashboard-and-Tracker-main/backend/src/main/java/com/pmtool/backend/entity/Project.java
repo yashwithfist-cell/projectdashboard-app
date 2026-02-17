@@ -44,6 +44,12 @@ public class Project {
 	@OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Set<ProjectAssignment> assignments = new HashSet<>();
 
+	@OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private Set<TimeLineSummary> timelineSummary = new HashSet<>();
+
+	@Column(name = "file_path")
+	String filePath;
+
 	public Project() {
 	}
 
@@ -117,6 +123,22 @@ public class Project {
 
 	public void setAssignments(Set<ProjectAssignment> assignments) {
 		this.assignments = assignments;
+	}
+
+	public String getFilePath() {
+		return filePath;
+	}
+
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
+	}
+
+	public Set<TimeLineSummary> getTimelineSummary() {
+		return timelineSummary;
+	}
+
+	public void setTimelineSummary(Set<TimeLineSummary> timelineSummary) {
+		this.timelineSummary = timelineSummary;
 	}
 
 }

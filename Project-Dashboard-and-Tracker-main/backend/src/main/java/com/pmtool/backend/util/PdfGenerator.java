@@ -6,161 +6,178 @@ import com.pmtool.backend.DTO.SalarySlipDto;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 public class PdfGenerator {
 
-    public static ByteArrayInputStream generateSlip(SalarySlipDto slip) {
-    	Document document = new Document(PageSize.A5, 20, 20, 15, 15);
+	public static ByteArrayInputStream generateSlip(SalarySlipDto slip) {
+		double gross = slip.getBasic() + slip.getHra() + slip.getSpecial();
+		double totalDeductions = slip.getProfessionalTax() + slip.getTds() + slip.getProvidentFund();
+		double net = gross - totalDeductions;
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+		Document document = new Document(PageSize.A5, 20, 20, 15, 15);
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		try {
+			PdfWriter.getInstance(document, out);
+			document.open();
 
-        try {
-            PdfWriter.getInstance(document, out);
-            document.open();
+			Image logo = Image.getInstance(PdfGenerator.class.getClassLoader().getResource("logo192.png"));
+			logo.scaleAbsolute(60, 60);
+			logo.setAlignment(Image.ALIGN_LEFT);
+			document.add(logo);
 
-            // ------------- FONTS ---------------
-            Font titleFont = new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD);
-            Font subTitleFont = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
-            Font sectionHeaderFont = new Font(Font.FontFamily.HELVETICA, 11, Font.BOLD, BaseColor.WHITE);
-            Font boldFont = new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD);
-            Font normalFont = new Font(Font.FontFamily.HELVETICA, 10);
+			Font companyFont = new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD);
+			Font headerFont = new Font(Font.FontFamily.HELVETICA, 11, Font.BOLD);
+			Font normalFont = new Font(Font.FontFamily.HELVETICA, 10);
+			Font boldFont = new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD);
 
-            // ------------- HEADER ---------------
-            Paragraph title = new Paragraph(slip.getCompanyName(), titleFont);
-            title.setAlignment(Element.ALIGN_CENTER);
-            document.add(title);
+			Paragraph company = new Paragraph("Fist Engineering Solutions LLP", companyFont);
+			company.setAlignment(Element.ALIGN_LEFT);
+			document.add(company);
 
-            Paragraph subTitle = new Paragraph("Salary Slip - " + slip.getMonth(), subTitleFont);
-            subTitle.setAlignment(Element.ALIGN_CENTER);
-            document.add(subTitle);
+			Paragraph address = new Paragraph("First Floor Mak Mall Kankanady,\nMangalore-575002 Karnataka, India.",
+					normalFont);
+			address.setAlignment(Element.ALIGN_LEFT);
+			document.add(address);
 
-            document.add(Chunk.NEWLINE);
+			document.add(Chunk.NEWLINE);
 
-            // ------------- EMPLOYEE INFORMATION ---------------
-            PdfPTable infoTable = new PdfPTable(4);
-            infoTable.setWidthPercentage(100);
-            infoTable.setWidths(new float[]{1.5f, 2.5f, 1.5f, 2.5f});
-            infoTable.setSpacingBefore(10);
+			Paragraph title = new Paragraph("Employee Pay Summary", headerFont);
+			title.setAlignment(Element.ALIGN_LEFT);
+			title.setSpacingAfter(5);
+			document.add(title);
 
-            addInfoRow(infoTable, "Employee Name", slip.getEmployeeName(), "Department", slip.getDepartment(), normalFont);
-            addInfoRow(infoTable, "Designation", slip.getDepartment(), "Location", slip.getLocation(), normalFont);
-            addInfoRow(infoTable, "Bank Name", slip.getBankName(), "Account Number", slip.getBankAccountNo(), normalFont);
+			PdfPTable empTable = new PdfPTable(4);
+			empTable.setWidthPercentage(100);
+			empTable.setSpacingBefore(0);
+			empTable.setWidths(new float[] { 3, 3, 3, 3 });
 
-            document.add(infoTable);
-            document.add(Chunk.NEWLINE);
+			addLabelValue(empTable, "Employee Name", slip.getEmployeeName(), "Employee ID", slip.getEmployeeId(),
+					normalFont);
+			addLabelValue(empTable, "Joining Date", slip.getJoiningDate().toString(), "Pay Period", slip.getMonth(),
+					normalFont);
+			addLabelValue(empTable, "Paid Days", String.valueOf(slip.getTotalDays()), "Loss of Pay Days",
+					String.valueOf(slip.getLopDays()), normalFont);
 
-            // ------------- SECTION HEADERS (Blue background) --------------- 
-            PdfPCell earningHeader = new PdfPCell(new Phrase("EARNINGS", sectionHeaderFont));
-            earningHeader.setBackgroundColor(new BaseColor(0, 102, 204));
-            earningHeader.setHorizontalAlignment(Element.ALIGN_CENTER);
-            earningHeader.setPadding(7);
+			PdfPTable wrapper = new PdfPTable(1);
+			wrapper.setWidthPercentage(100);
 
-            PdfPCell deductionHeader = new PdfPCell(new Phrase("DEDUCTIONS", sectionHeaderFont));
-            deductionHeader.setBackgroundColor(new BaseColor(178, 34, 34));
-            deductionHeader.setHorizontalAlignment(Element.ALIGN_CENTER);
-            deductionHeader.setPadding(7);
+			PdfPCell wrapperCell = new PdfPCell(empTable);
+			wrapperCell.setBorder(Rectangle.BOX);
+			wrapperCell.setBorderWidthRight(0);
+			wrapperCell.setBorderWidthLeft(0);
+			wrapperCell.setPaddingBottom(0);
 
-            PdfPTable mainTable = new PdfPTable(2);
-            mainTable.setWidths(new float[]{1, 1});
-            mainTable.setWidthPercentage(100);
-            mainTable.addCell(earningHeader);
-            mainTable.addCell(deductionHeader);
+			wrapper.addCell(wrapperCell);
+			document.add(wrapper);
 
-            // ------------- EARNINGS TABLE ---------------
-            PdfPTable earningsTable = new PdfPTable(2);
-            earningsTable.setWidthPercentage(100);
-            addRow(earningsTable, "Basic + Dearness Allowance", slip.getBasic(), normalFont);
-//            addRow(earningsTable, "Dearness Allowance", slip.getDa(), normalFont);
-            addRow(earningsTable, "House Rent Allowance", slip.getHra(), normalFont);
-//            addRow(earningsTable, "Conveyance Allowance", slip.getConveyance(), normalFont);
-//            addRow(earningsTable, "Medical Allowance", slip.getMedical(), normalFont);
-            addRow(earningsTable, "Special Allowance", slip.getSpecial(), normalFont);
+//			document.add(empTable);
 
-            // ------------- DEDUCTIONS TABLE ---------------
-            PdfPTable deductionTable = new PdfPTable(2);
-            deductionTable.setWidthPercentage(100);
-            addRow(deductionTable, "Professional Tax", slip.getProfessionalTax(), normalFont);
-            addRow(deductionTable, "Tax Deducted at Source", slip.getTds(), normalFont);
-            addRow(deductionTable, "Employee Provident Fund", slip.getProvidentFund(), normalFont);
+			document.add(Chunk.NEWLINE);
 
-            mainTable.addCell(new PdfPCell(earningsTable));
-            mainTable.addCell(new PdfPCell(deductionTable));
-            document.add(mainTable);
+			Paragraph salDetailsTitle = new Paragraph("Salary Details :", headerFont);
+			salDetailsTitle.setAlignment(Element.ALIGN_LEFT);
+			salDetailsTitle.setSpacingAfter(5);
+			document.add(salDetailsTitle);
 
-            document.add(Chunk.NEWLINE);
+			PdfPTable salaryTable = new PdfPTable(4);
+			salaryTable.setWidthPercentage(100);
+			salaryTable.setWidths(new float[] { 3, 2, 3, 2 });
 
-            // ------------- TOTAL SECTION ---------------
-//            double gross = slip.getSalary() + slip.getDa() + slip.getHra() + slip.getConveyance() + slip.getMedical() + slip.getSpecial();
-            double gross = slip.getBasic() + slip.getHra() + slip.getSpecial();
-            double totalDeductions = slip.getProfessionalTax() + slip.getTds() + slip.getProvidentFund();
-            double net = gross - totalDeductions;
+			addHeader(salaryTable, "Earnings");
+			addHeader(salaryTable, "Amount");
+			addHeader(salaryTable, "Deductions");
+			addHeader(salaryTable, "Amount");
 
-            PdfPTable totals = new PdfPTable(2);
-            totals.setWidthPercentage(60);
-            totals.setHorizontalAlignment(Element.ALIGN_LEFT);
-            totals.setSpacingBefore(15);
-            totals.setWidths(new float[]{3, 1});
+			String earnings = "Basic + D.A House\n\nRent Allowance\n\nSpecial Allowance\n\nEmployer ESI @ 3.25%";
+			String earningAmounts = (gross <= 21000)
+					? String.format("%.2f\n\n%.2f\n\n%.2f\n\n%.2f", slip.getBasic(), slip.getHra(), slip.getSpecial(),
+							slip.getEmployerEsi())
+					: String.format("%.2f\n\n%.2f\n\n%.2f\n\nN/A", slip.getBasic(), slip.getHra(), slip.getSpecial());
 
-            addTotalRow(totals, "Gross Salary", gross, boldFont);
-            addTotalRow(totals, "Deductions", totalDeductions, boldFont);
-            addTotalRow(totals, "Net Salary", net, boldFont);
-            addTotalRow(totals, "Total Working Days", slip.getTotalDays(), boldFont);
+			String deductions = "Income Tax\n\nProfessional Tax ESI\n\nESI\n\nEmployee ESI @ 0.75%\n\nEmployer ESI @ 3.25%\n\nLoss of Pay (LOP)";
+			String deductionAmounts = (gross <= 21000)
+					? String.format("%.2f\n\n%.2f\n\n%.2f\n\n%.2f\n\n\n%.2f\n\n\n%.2f", slip.getTds(),
+							slip.getProfessionalTax(), slip.getEsi(), slip.getEmployeeEsi(), slip.getEmployerEsi(),
+							slip.getLopAmount())
+					: String.format("%.2f\n\n%.2f\n\nN/A\n\nN/A\n\n\nN/A\n\n\n%.2f", slip.getTds(),
+							slip.getProfessionalTax(), slip.getLopAmount());
 
-            document.add(totals);
+			Font font = new Font(Font.FontFamily.HELVETICA, 10);
 
-            document.add(Chunk.NEWLINE);
+			addRow(salaryTable, earnings, font);
+			addRow(salaryTable, earningAmounts, font);
+			addRow(salaryTable, deductions, font);
+			addRow(salaryTable, deductionAmounts, font);
 
-            // ------------- FOOTER (Bordered acknowledgement) ---------------
-            Paragraph footer = new Paragraph(
-                    "This is a computer-generated salary slip; no signature is required.",
-                    new Font(Font.FontFamily.HELVETICA, 9, Font.ITALIC, BaseColor.GRAY)
-            );
-            footer.setAlignment(Element.ALIGN_CENTER);
-            footer.setSpacingBefore(20);
-            document.add(footer);
+			addRow(salaryTable, "Gross Earnings", font);
+			addRow(salaryTable, String.valueOf(gross), font);
+			addRow(salaryTable, "Total Deduction", font);
+			addRow(salaryTable, String.valueOf(totalDeductions), font);
 
-            document.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+			Font footerFont = new Font(Font.FontFamily.HELVETICA, 11, Font.BOLD);
 
-        return new ByteArrayInputStream(out.toByteArray());
-    }
+			addRow(salaryTable, "", footerFont);
+			addRow(salaryTable, "", footerFont);
+			addRow(salaryTable, "Net Amount", footerFont);
+			addRow(salaryTable, String.valueOf(net), footerFont);
+			document.add(salaryTable);
 
-    // --------------- Helper Functions ---------------
-    private static void addInfoRow(PdfPTable table, String label1, String value1, String label2, String value2, Font font) {
-        table.addCell(makeLabel(label1 + ":", font));
-        table.addCell(makeValue(value1, font));
-        table.addCell(makeLabel(label2 + ":", font));
-        table.addCell(makeValue(value2, font));
-    }
+			document.add(Chunk.NEWLINE);
 
-    private static PdfPCell makeLabel(String text, Font font) {
-        PdfPCell cell = new PdfPCell(new Phrase(text, font));
-        cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
-        cell.setPadding(5);
-        return cell;
-    }
+			Paragraph words = new Paragraph(NumberToWords.convert(net), boldFont);
+			words.setSpacingBefore(5);
+			document.add(words);
+			Paragraph comGenWord = new Paragraph("*THIS IS COMPUTER GENERATED SALARY SLIP", font);
+			comGenWord.setSpacingBefore(50);
+			comGenWord.setAlignment(Element.ALIGN_CENTER);
+			document.add(comGenWord);
+			document.close();
+		} catch (DocumentException | IOException e) {
+			e.printStackTrace();
+		}
+		return new ByteArrayInputStream(out.toByteArray());
 
-    private static PdfPCell makeValue(String text, Font font) {
-        PdfPCell cell = new PdfPCell(new Phrase(text, font));
-        cell.setPadding(5);
-        return cell;
-    }
+	}
 
-    private static void addRow(PdfPTable table, String head, double amount, Font font) {
-        table.addCell(new Phrase(head, font));
-        table.addCell(new Phrase(String.format("%.2f", amount), font));
-    }
+	private static void addLabelValue(PdfPTable table, String label1, String value1, String label2, String value2,
+			Font font) {
+		PdfPCell cell1 = new PdfPCell(new Phrase(label1 + " :", font));
+		cell1.setBorder(Rectangle.NO_BORDER);
+		cell1.setPadding(5);
+		table.addCell(cell1);
 
-    private static void addTotalRow(PdfPTable table, String label, double amount, Font font) {
-        PdfPCell left = new PdfPCell(new Phrase(label, font));
-        left.setBorder(Rectangle.BOX);
-        table.addCell(left);
+		PdfPCell cell2 = new PdfPCell(new Phrase(value1 != null ? value1 : "", font));
+		cell2.setBorder(Rectangle.NO_BORDER);
+		cell2.setPadding(5);
+		table.addCell(cell2);
 
-        PdfPCell right = new PdfPCell(new Phrase(String.format("%.2f", amount), font));
-        right.setBorder(Rectangle.BOX);
-        right.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        table.addCell(right);
-    }
+		PdfPCell cell3 = new PdfPCell(new Phrase(label2 + " :", font));
+		cell3.setBorder(Rectangle.NO_BORDER);
+		cell3.setPadding(5);
+		table.addCell(cell3);
+
+		PdfPCell cell4 = new PdfPCell(new Phrase(value2 != null ? value2 : "", font));
+		cell4.setBorder(Rectangle.NO_BORDER);
+		cell4.setPadding(5);
+		table.addCell(cell4);
+	}
+
+	private static void addRow(PdfPTable table, String data, Font font) {
+		PdfPCell cell = new PdfPCell(new Phrase(data, font));
+		cell.setPadding(5);
+		table.addCell(cell);
+	}
+
+	private static void addHeader(PdfPTable table, String text) {
+		Font headerFont = new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD, BaseColor.BLACK);
+
+		PdfPCell header = new PdfPCell(new Phrase(text, headerFont));
+//		header.setBackgroundColor(new BaseColor(0, 102, 204)); // Blue
+		header.setHorizontalAlignment(Element.ALIGN_CENTER);
+		header.setPadding(6);
+
+		table.addCell(header);
+	}
+
 }

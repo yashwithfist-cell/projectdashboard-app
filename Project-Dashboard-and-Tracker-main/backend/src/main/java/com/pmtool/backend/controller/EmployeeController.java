@@ -68,7 +68,7 @@ public class EmployeeController {
 	}
 
 	@GetMapping("/getProjectManagers/{role}")
-	@PreAuthorize("hasAnyRole('PROJECT_MANAGER','TEAM_LEAD','EMPLOYEE','SYSTEM_ADMIN','HUMAN_RESOURCE')")
+	@PreAuthorize("hasAnyRole('PROJECT_MANAGER','TEAM_LEAD','EMPLOYEE','SYSTEM_ADMIN','HUMAN_RESOURCE','SUPER_ADMIN')")
 	public List<EmployeeResponseDTO> getAllManagers(@PathVariable Role role) {
 		return employeeService.getManagersByRole(role);
 	}

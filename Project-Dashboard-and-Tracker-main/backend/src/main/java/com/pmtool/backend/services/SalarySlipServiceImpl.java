@@ -60,13 +60,14 @@ public class SalarySlipServiceImpl implements SalarySlipService {
 			profTax = 200;
 //			netSalary = netSalary - profTax;
 		}
-		double specialHra = Math.round((baseSalary * 20) / 100);
+		double specialHra = Math.round((baseSalary * 25) / 100);
 		return SalarySlipDto.builder().bankAccountNo(emp.getBankAccountNo()).bankName(emp.getBankName().toUpperCase())
 				.location(emp.getLocation().toUpperCase()).salary(Math.round(netSalary * 100.0) / 100.0)
 				.employeeName(emp.getName().toUpperCase()).companyName(SalarySlipConstants.COMPANY_NAME)
 				.month(Month.of(month).name().toUpperCase()).department(emp.getDepartment().getName().toUpperCase())
 				.professionalTax(profTax).tds(Math.round(yearlyTds / 12.0)).totalDays(workingDays - unpaidLeaves)
-				.hra(specialHra).special(specialHra).basic((baseSalary * 60) / 100).build();
+				.hra(specialHra).special(specialHra).basic((baseSalary * 50) / 100).lopDays(unpaidLeaves * perDaySalary)
+				.joiningDate(emp.getJoinDate()).employeeId(emp.getEmployeeId()).build();
 
 	}
 }

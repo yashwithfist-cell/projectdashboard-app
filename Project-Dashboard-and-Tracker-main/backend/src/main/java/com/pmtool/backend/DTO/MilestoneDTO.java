@@ -13,6 +13,7 @@ public class MilestoneDTO {
     private String name;
     private Long projectId;
     private LocalDate dueDate; // <-- ADD THIS FIELD
+    private Long disciplineId;
 
     // This constructor is useful for simple lists
     public MilestoneDTO(Long id, String name) {

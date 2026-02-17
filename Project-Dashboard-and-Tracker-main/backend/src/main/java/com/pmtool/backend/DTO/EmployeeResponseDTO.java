@@ -42,6 +42,7 @@ public class EmployeeResponseDTO {
 	private String mailId;
 	private String managerName;
 	private String leadName;
+	private String empDeviceCode;
 
 	public EmployeeResponseDTO(Employee employee) {
 		this.employeeId = employee.getEmployeeId();
@@ -58,6 +59,7 @@ public class EmployeeResponseDTO {
 		this.mailId = employee.getMailId();
 		this.managerName = employee.getMgrName();
 		this.leadName = employee.getTeamLeadName();
+		this.empDeviceCode = employee.getEmpDeviceCode();
 		// Map all the new fields
 	}
 }

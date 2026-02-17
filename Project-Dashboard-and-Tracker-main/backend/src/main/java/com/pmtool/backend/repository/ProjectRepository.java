@@ -3,12 +3,15 @@ package com.pmtool.backend.repository;
 import com.pmtool.backend.DTO.ProjectResponseDTO;
 import com.pmtool.backend.entity.Discipline;
 import com.pmtool.backend.entity.Project;
+import com.pmtool.backend.entity.WorkLogEntry;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, Long> {
@@ -43,4 +46,17 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 			  WHERE pa.employee.username = :username
 			""")
 	List<Project> findAllProjectsByTeamLead(@Param("username") String username);
+
+	@Query("""
+			SELECT DISTINCT p
+			FROM Project p
+			JOIN FETCH p.milestones m
+			JOIN FETCH m.disciplines d
+			WHERE p.name = :projectName
+			AND m.name = :milestoneName
+			AND d.name = :disciplineName
+			""")
+	Optional<Project> findProjectWithMilestoneAndDiscipline(String projectName, String milestoneName,
+			String disciplineName);
+
 }

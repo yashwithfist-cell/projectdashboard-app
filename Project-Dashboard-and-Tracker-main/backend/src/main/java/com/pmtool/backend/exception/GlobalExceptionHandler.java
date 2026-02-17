@@ -57,7 +57,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<Object> handleLeaveNotFoundException(LeaveNotFoundException ex) {
 		return buildResponse(HttpStatus.BAD_REQUEST, "Leave Not Found", ex.getMessage());
 	}
-	
+
 	@ExceptionHandler(LeaveNotAllowedException.class)
 	public ResponseEntity<Object> handleLeaveNotAllowedException(LeaveNotAllowedException ex) {
 		return buildResponse(HttpStatus.BAD_REQUEST, "Leave Not Allowed", ex.getMessage());
@@ -73,6 +73,11 @@ public class GlobalExceptionHandler {
 		return buildResponse(HttpStatus.BAD_REQUEST, "Notification Insertion Failed", ex.getMessage());
 	}
 
+	@ExceptionHandler(DisciplineInsertionFailedException.class)
+	public ResponseEntity<Object> handleDisciplineInsertionFailedException(DisciplineInsertionFailedException ex) {
+		return buildResponse(HttpStatus.BAD_REQUEST, "Discipline Insertion Failed", ex.getMessage());
+	}
+
 	@ExceptionHandler(ResourceNotFoundException.class)
 	public ResponseEntity<ApiResponse> handleResourceNotFound(ResourceNotFoundException ex, HttpServletRequest req) {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -84,7 +89,15 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ApiResponse> handleNotificationSendingFailed(NotificationSendingFailedException ex,
 			HttpServletRequest req) {
 		return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
-				.body(ApiResponse.builder().success(false).message(ex.getMessage()).errorCode("Notification Sending Failed")
+				.body(ApiResponse.builder().success(false).message(ex.getMessage())
+						.errorCode("Notification Sending Failed").timestamp(LocalDateTime.now())
+						.path(req.getRequestURI()).build());
+	}
+
+	@ExceptionHandler(TimeLineException.class)
+	public ResponseEntity<ApiResponse> handleTimeLineException(TimeLineException ex, HttpServletRequest req) {
+		return ResponseEntity.status(HttpStatus.FAILED_DEPENDENCY)
+				.body(ApiResponse.builder().success(false).message(ex.getMessage()).errorCode("Time Line Error")
 						.timestamp(LocalDateTime.now()).path(req.getRequestURI()).build());
 	}
 

@@ -35,5 +35,6 @@ public class CreateEmployeeDTO {
 	private String mailId;
 	private String managerName;
 	private String leadName;
+	private String empDeviceCode;
 
 }

@@ -7,7 +7,7 @@ public class BiometricDeviceConstants {
 	public static final String YYYY_MM_DD_HH_MM_SS="yyyy-MM-dd HH:mm:ss";
 	public static final String IN="in";
 	public static final String OUT="out";
-	public static final String EMP_ID="empId";
+	public static final String EMP_DEVICE_CODE="empDeviceCode";
 	public static final String DATE="date";
 	public static final String TOTAL_HOURS_WORKED="totalHoursWorked";
 	public static final String FIRST_CHECK_IN="firstCheckin";

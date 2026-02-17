@@ -1,17 +1,30 @@
 package com.pmtool.backend.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+//@Data
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "milestones")
 public class Milestone {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@EqualsAndHashCode.Include
 	private Long id;
 
 	@Column(name = "milestone_name", nullable = false)
@@ -30,55 +43,20 @@ public class Milestone {
 	@OneToMany(mappedBy = "milestone", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Set<ProjectAssignment> projectAssignments = new HashSet<ProjectAssignment>();
 
-	public Milestone() {
+//	@ManyToOne(fetch = FetchType.LAZY)
+//	@JoinColumn(name = "discipline_id",referencedColumnName = "id", nullable = false)
+//	private Discipline discipline;
+	@OneToMany(mappedBy = "milestone", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+	private Set<Discipline> disciplines = new HashSet<Discipline>();
+
+	public void addDiscipline(Discipline discipline) {
+		disciplines.add(discipline);
+		discipline.setMilestone(this);
 	}
 
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public LocalDate getDueDate() {
-		return dueDate;
-	}
-
-	public void setDueDate(LocalDate dueDate) {
-		this.dueDate = dueDate;
-	}
-
-	public Project getProject() {
-		return project;
-	}
-
-	public void setProject(Project project) {
-		this.project = project;
-	}
-
-	public Set<WorkLogEntry> getWorkLogEntries() {
-		return workLogEntries;
-	}
-
-	public void setWorkLogEntries(Set<WorkLogEntry> workLogEntries) {
-		this.workLogEntries = workLogEntries;
-	}
-
-	public Set<ProjectAssignment> getProjectAssignments() {
-		return projectAssignments;
-	}
-
-	public void setProjectAssignments(Set<ProjectAssignment> projectAssignments) {
-		this.projectAssignments = projectAssignments;
+	public void removeDiscipline(Discipline discipline) {
+		disciplines.remove(discipline);
+		discipline.setMilestone(null);
 	}
 
 }

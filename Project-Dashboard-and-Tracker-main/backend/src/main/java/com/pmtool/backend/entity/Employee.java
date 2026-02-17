@@ -72,4 +72,16 @@ public class Employee {
 	@Column(name = "team_lead_name", nullable = false)
 	private String teamLeadName;
 
+	@OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<IdleLog> idelLogSet;
+
+	@OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<TimeLineSummary> timeLineSet;
+
+	@OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<TimerWorkLog> timerSet;
+
+	@Column(name = "employee_device_code")
+	private String empDeviceCode;
+
 }

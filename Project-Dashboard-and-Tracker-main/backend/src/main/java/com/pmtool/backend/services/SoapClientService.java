@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -30,11 +31,14 @@ import com.pmtool.backend.entity.Notification;
 import com.pmtool.backend.entity.SystemAttendance;
 import com.pmtool.backend.enums.AttendanceStatus;
 import com.pmtool.backend.enums.Status;
+import com.pmtool.backend.exception.EmployeeNotFoundException;
+import com.pmtool.backend.exception.ResourceNotFoundException;
 import com.pmtool.backend.exception.SystemAttendanceNotFoundException;
 import com.pmtool.backend.repository.AttendanceRepository;
 import com.pmtool.backend.repository.EmployeeRepository;
 import com.pmtool.backend.repository.NotificationRepository;
 import com.pmtool.backend.repository.SystemAttendanceRepository;
+import com.pmtool.backend.repository.WorkLogEntryRepository;
 import com.pmtool.backend.util.AttendanceUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -65,6 +69,18 @@ public class SoapClientService {
 
 	private final RestTemplate restTemplate = new RestTemplate();
 
+	@Value("${biometric.username}")
+	private String username;
+
+	@Value("${biometric.password}")
+	private String password;
+
+	@Value("${biometric.device.serial}")
+	private String serial;
+
+	@Autowired
+	private WorkLogEntryRepository workLogEntryRepo;
+
 	public void fetchData(String fromDate, String toDate, String serial, String user, String pass) throws Exception {
 		String xml = buildSoapRequest(fromDate, toDate, serial, user, pass);
 		HttpHeaders headers = new HttpHeaders();
@@ -90,12 +106,12 @@ public class SoapClientService {
 						parts[2].toLowerCase()))
 				.collect(Collectors.toList());
 		Map<String, Map<LocalDate, List<AttendanceLogDto>>> grouped = logs.stream().collect(Collectors.groupingBy(
-				AttendanceLogDto::getEmpId, Collectors.groupingBy(log -> log.getTimestamp().toLocalDate())));
+				AttendanceLogDto::getEmpDeviceCode, Collectors.groupingBy(log -> log.getTimestamp().toLocalDate())));
 		List<Map<String, String>> result = new ArrayList<>();
 		List<AttendanceLog> resultList = new ArrayList<>();
 		for (var empEntry : grouped.entrySet()) {
-			String empId = empEntry.getKey();
-			Employee employee = employeeRepository.findByEmployeeId(empId);
+			String empDeviceCode = empEntry.getKey();
+			Employee employee = employeeRepository.findByEmpDeviceCode(empDeviceCode);
 			if (employee != null) {
 				for (var dayEntry : empEntry.getValue().entrySet()) {
 					LocalDate date = dayEntry.getKey();
@@ -114,8 +130,8 @@ public class SoapClientService {
 							inTime = null;
 						}
 					}
-					result.add(Map.of(BiometricDeviceConstants.EMP_ID, empId, BiometricDeviceConstants.DATE,
-							date.toString(), BiometricDeviceConstants.TOTAL_HOURS_WORKED,
+					result.add(Map.of(BiometricDeviceConstants.EMP_DEVICE_CODE, empDeviceCode,
+							BiometricDeviceConstants.DATE, date.toString(), BiometricDeviceConstants.TOTAL_HOURS_WORKED,
 							AttendanceUtils.formatDuration(total), BiometricDeviceConstants.FIRST_CHECK_IN,
 							firstCheckin.toString(), BiometricDeviceConstants.LAST_CHECK_OUT, lastCheckout.toString(),
 							BiometricDeviceConstants.TOTAL_HOURS,
@@ -218,5 +234,79 @@ public class SoapClientService {
 				+ "<ToDateTime>" + toDate + "</ToDateTime>" + "<SerialNumber>" + serial + "</SerialNumber>"
 				+ "<UserName>" + user + "</UserName>" + "<UserPassword>" + pass + "</UserPassword>"
 				+ "<strDataList></strDataList>" + "</GetTransactionsLog>" + "</soap:Body>" + "</soap:Envelope>";
+	}
+
+	public AttendanceLogDto fetchEmployeeData(String userName) throws Exception {
+		long totalMillis = 0;
+		LocalDateTime lastIn = null;
+		LocalDateTime lastOut = null;
+		LocalDate today = LocalDate.now();
+		String fromDate = today.toString() + BiometricDeviceConstants.START_TIME;
+		String toDate = today.toString() + BiometricDeviceConstants.END_TIME;
+		String xml = buildSoapRequest(fromDate, toDate, serial, username, password);
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.TEXT_XML);
+		headers.add(BiometricDeviceConstants.SOAP_ACTION, soapAction);
+		HttpEntity<String> entity = new HttpEntity<>(xml, headers);
+		ResponseEntity<String> response = restTemplate.postForEntity(endpoint, entity, String.class);
+		String responseXml = response.getBody();
+		if (responseXml == null || !responseXml.contains("<strDataList>")) {
+			log.info("⚠️ No log data found in response");
+		}
+		Pattern pattern = Pattern.compile("<strDataList>(.*?)</strDataList>", Pattern.DOTALL);
+		Matcher matcher = pattern.matcher(responseXml);
+		String dataList = "";
+		if (matcher.find()) {
+			dataList = matcher.group(1).trim();
+		}
+		Employee employee = employeeRepository.findByUsername(userName)
+				.orElseThrow(() -> new EmployeeNotFoundException("Employee not found with username : " + userName));
+		List<AttendanceLogDto> logs = Arrays.stream(dataList.split("\n")).map(String::trim)
+				.filter(line -> !line.isEmpty()).map(line -> line.split("\\t")).filter(parts -> parts.length == 3)
+				.map(parts -> new AttendanceLogDto(parts[0],
+						LocalDateTime.parse(parts[1],
+								DateTimeFormatter.ofPattern(BiometricDeviceConstants.YYYY_MM_DD_HH_MM_SS)),
+						parts[2].toLowerCase()))
+//				.filter(log -> log.getEmpId().equals(employee.getEmployeeId())) // ✅ filter here
+				.filter(log -> log.getEmpDeviceCode().equals(employee.getEmpDeviceCode())).collect(Collectors.toList());
+
+		List<AttendanceLogDto> dayLogs = logs.stream().sorted(Comparator.comparing(AttendanceLogDto::getTimestamp))
+				.collect(Collectors.toList());
+//		LocalDateTime firstCheckin = AttendanceUtils.getFirstCheckIn(dayLogs);
+//		if (firstCheckin != null) {
+//			return firstCheckin;
+//		}
+//		return null;
+		AttendanceLogDto dto = new AttendanceLogDto();
+		for (AttendanceLogDto log : dayLogs) {
+
+			if ("in".equalsIgnoreCase(log.getDirection())) {
+				lastIn = log.getTimestamp();
+				dto.getInList().add(log.getTimestamp());
+			}
+
+			if ("out".equalsIgnoreCase(log.getDirection()) && lastIn != null) {
+				totalMillis += Duration.between(lastIn, log.getTimestamp()).toMillis();
+				lastOut = log.getTimestamp();
+				lastIn = null;
+				dto.getOutList().add(log.getTimestamp());
+			}
+		}
+
+		dto.setTotalWorkedMillis(totalMillis);
+		dto.setLastCheckOut(lastOut);
+
+		dto.setFirstCheckIn(logs.stream().filter(l -> "in".equalsIgnoreCase(l.getDirection()))
+				.map(AttendanceLogDto::getTimestamp).findFirst().orElse(null));
+
+		if (lastIn != null) {
+			dto.setCurrentlyCheckedIn(true);
+			dto.setLastCheckIn(lastIn);
+		} else {
+			dto.setCurrentlyCheckedIn(false);
+		}
+
+		return dto;
+
 	}
 }

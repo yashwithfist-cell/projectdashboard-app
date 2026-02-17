@@ -1,6 +1,7 @@
 package com.pmtool.backend.controller;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,15 +33,24 @@ public class AttendanceLogController {
 		List<AttendanceLogDto> result = attendanceLogService.searchAttendance(from, to);
 		return ResponseEntity.ok(result);
 	}
-	
+
 	@GetMapping("/searchByEmployee")
 	@PreAuthorize("hasRole('EMPLOYEE')")
-	public ResponseEntity<List<AttendanceLogDto>> searchByEmployee(@RequestParam String fromDate, @RequestParam String toDate,Authentication authentication) {
+	public ResponseEntity<List<AttendanceLogDto>> searchByEmployee(@RequestParam String fromDate,
+			@RequestParam String toDate, Authentication authentication) {
 		LocalDate from = LocalDate.parse(fromDate);
 		LocalDate to = LocalDate.parse(toDate);
-		String username=authentication.getName();
+		String username = authentication.getName();
 		List<AttendanceLogDto> result = attendanceLogService.searchAttendanceByEmployee(from, to, username);
 		return ResponseEntity.ok(result);
+	}
+
+	@GetMapping("/empCheckIn")
+	@PreAuthorize("hasRole('EMPLOYEE')")
+	public ResponseEntity<AttendanceLogDto> getEmployeeCheckIn(Authentication authentication) {
+		String username = authentication.getName();
+		AttendanceLogDto attendanceLog = attendanceLogService.getEmployeeAttendance(username);
+		return ResponseEntity.ok(attendanceLog);
 	}
 
 }
