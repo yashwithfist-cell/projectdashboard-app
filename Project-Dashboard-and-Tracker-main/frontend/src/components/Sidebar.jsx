@@ -11,8 +11,8 @@ const navItemsAdmin = [
   { label: "Employees", path: "/saemployees" },
   { label: "MasterData", path: "/masterdatareport" },
   { label: "MilestoneReport", path: "/milestonedatareport" },
-  { label: "Attendance Log", path: "/saattendancelog" },
-  { label: "System Log", path: "/sasystemlog" },
+  // { label: "Attendance Log", path: "/saattendancelog" },
+  // { label: "System Log", path: "/sasystemlog" },
   { label: "Notifications", path: "/sanotification" }
 ];
 

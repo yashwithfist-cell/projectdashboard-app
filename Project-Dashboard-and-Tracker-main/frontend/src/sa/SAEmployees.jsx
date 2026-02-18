@@ -9,6 +9,7 @@ export const deleteEmployee = (id) => api.delete(`/employees/${id}`);
 
 // --- SIMPLIFIED Employee Detail Modal ---
 const EmployeeDetailModal = ({ employee, onClose }) => {
+
   if (!employee) return null;
 
   return (
@@ -58,6 +59,15 @@ const SAEmployees = () => {
 
   const [managers, setManagers] = useState([]);
   const [teamleads, setTeamleads] = useState([]);
+
+  const [page, setPage] = useState(0);
+  const [size] = useState(10);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
+
+  const [search, setSearch] = useState("");
+  const [sortField, setSortField] = useState("name");
+  const [sortDir, setSortDir] = useState("asc");
 
 
   // SIMPLIFIED state for adding a new employee
@@ -116,7 +126,7 @@ const SAEmployees = () => {
     fetchEmployees();
     api.get('/departments').then(res => setDepartments(res.data));
     fetchRoles();
-  }, []);
+  }, [page, sortField, sortDir, search]);
 
 
   const fetchRoles = async () => {
@@ -130,14 +140,36 @@ const SAEmployees = () => {
 
 
 
+  // const fetchEmployees = async () => {
+  //   try {
+  //     const res = await getEmployees();
+  //     setEmployees(res.data);
+  //   } catch (err) {
+  //     console.error('Failed to fetch employees:', err);
+  //   }
+  // };
+
   const fetchEmployees = async () => {
     try {
-      const res = await getEmployees();
-      setEmployees(res.data);
+      const res = await api.get("/employees/getEmployees", {
+        params: {
+          page,
+          size,
+          sortField,
+          sortDir,
+          search
+        }
+      });
+
+      setEmployees(res.data.data.content);
+      setTotalPages(res.data.data.totalPages);
+      setTotalElements(res.data.data.totalElements);
+
     } catch (err) {
-      console.error('Failed to fetch employees:', err);
+      console.error("Failed to fetch employees:", err);
     }
   };
+
 
   const handleView = (employee) => {
     setSelectedEmployee(employee);
@@ -244,11 +276,34 @@ const SAEmployees = () => {
           </button>
         </div>
         <div className="w-full overflow-x-auto">
+          <div className="flex justify-between mb-4">
+            <input
+              type="text"
+              placeholder="Search by Name or ID..."
+              value={search}
+              onChange={(e) => {
+                setPage(0);
+                setSearch(e.target.value);
+              }}
+              className="border px-3 py-2 rounded-md text-sm w-64"
+            />
+          </div>
+
           <table className="min-w-full w-full table-fixed text-xs divide-y divide-gray-200">
             <thead className="bg-gray-100">
               <tr>
                 <th className="px-2 py-1 text-left text-[11px] font-semibold text-gray-500 uppercase truncate">Employee ID</th>
-                <th className="px-2 py-1 text-left text-[11px] font-semibold text-gray-500 uppercase truncate">Name</th>
+                {/* <th className="px-2 py-1 text-left text-[11px] font-semibold text-gray-500 uppercase truncate">Name</th> */}
+                <th
+                  onClick={() => {
+                    setSortField("name");
+                    setSortDir(sortDir === "asc" ? "desc" : "asc");
+                  }}
+                  className="px-2 py-1 text-left text-[11px] font-semibold text-gray-500 uppercase truncate cursor-pointer"
+                >
+                  Name {sortField === "name" ? (sortDir === "asc" ? "▲" : "▼") : ""}
+                </th>
+
                 <th className="px-2 py-1 text-left text-[11px] font-semibold text-gray-500 uppercase truncate">Department</th>
                 {/* <th className="px-2 py-1 text-left text-[11px] font-semibold text-gray-500 uppercase truncate">Role</th> */}
                 {/* <th className="px-2 py-1 text-left text-[11px] font-semibold text-gray-500 uppercase truncate">Bank Account Number</th> */}
@@ -288,6 +343,44 @@ const SAEmployees = () => {
               ))}
             </tbody>
           </table>
+
+          <div className="flex justify-between items-center mt-4">
+
+            <div className="text-sm text-gray-600">
+              Total Employees: {totalElements}
+            </div>
+
+            <div className="flex space-x-2">
+              <button
+                disabled={page === 0}
+                onClick={() => setPage(prev => prev - 1)}
+                className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+              >
+                Prev
+              </button>
+
+              {[...Array(totalPages)].map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setPage(index)}
+                  className={`px-3 py-1 rounded ${page === index ? "bg-blue-600 text-white" : "bg-gray-200"
+                    }`}
+                >
+                  {index + 1}
+                </button>
+              ))}
+
+              <button
+                disabled={page === totalPages - 1}
+                onClick={() => setPage(prev => prev + 1)}
+                className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+
+
         </div>
       </div>
 

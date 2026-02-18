@@ -73,6 +73,7 @@ const SuperAdminProjects = () => {
                 id: project.id,
                 name: project.name,
                 clientName: project.clientName || '',
+                estimatedHours: project.estimatedHours ?? 0,
                 disciplineIds: project.disciplines ? project.disciplines.map(d => d.id) : [],
                 projectManagerId: project.empId
                     || project.employeeId
@@ -80,7 +81,7 @@ const SuperAdminProjects = () => {
             });
         } else {
             setIsEditMode(false);
-            setCurrentProject({ id: null, name: '', clientName: '', disciplineIds: [], projectManagerId: null });
+            setCurrentProject({ id: null, name: '', clientName: '', estimatedHours: '', disciplineIds: [], projectManagerId: null });
         }
         setIsModalOpen(true);
     };
@@ -109,6 +110,7 @@ const SuperAdminProjects = () => {
         const projectData = {
             name: currentProject.name,
             clientName: currentProject.clientName,
+            estimatedHours: currentProject.estimatedHours,
             // disciplineIds: currentProject.disciplineIds,
             projectManagerId: currentProject.projectManagerId,
         };
@@ -153,8 +155,8 @@ const SuperAdminProjects = () => {
         <div className="p-8">
             {/* <h1 className="text-3xl font-bold mb-6">Projects Dashboard</h1> */}
             {/* <div className="p-6 bg-gray-100"> */}
-                {/* KPI Cards */}
-                {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {/* KPI Cards */}
+            {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                     <StatCard title="Total Projects" value={stats?.totalProjects || 0} color="border-blue-500" />
                     <StatCard title="Total Employees" value={stats?.totalEmployees || 0} color="border-green-500" />
                     <StatCard title="Total Departments" value={stats?.totalDepartments || 0} color="border-purple-500" />
@@ -213,6 +215,10 @@ const SuperAdminProjects = () => {
                             <div className="mb-4">
                                 <label className="block text-gray-700 text-sm font-bold mb-2">Client Name</label>
                                 <input type="text" name="clientName" value={currentProject.clientName} onChange={handleInputChange} className="w-full p-2 border rounded" />
+                            </div>
+                            <div className="mb-4">
+                                <label className="block text-gray-700 text-sm font-bold mb-2">Estimated Hours</label>
+                                <input type="number" min="0" step="0.5" name="estimatedHours" value={currentProject.estimatedHours} onChange={handleInputChange} className="w-full p-2 border rounded" />
                             </div>
                             {/* <div className="mb-6">
                                 <label className="block text-gray-700 text-sm font-bold mb-2">Assign Disciplines</label>
