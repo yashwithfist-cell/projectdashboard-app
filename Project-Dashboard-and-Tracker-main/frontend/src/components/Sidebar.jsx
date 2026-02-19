@@ -83,12 +83,14 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }) {
       <div className={`flex flex-col items-center mb-8 ${isCollapsed ? "hidden" : ""}`}>
         <img src="/FIST.jpg" alt="FIST Logo" className="w-24 h-24 mb-4 rounded-full shadow-lg" />
         <h1 className="text-1xl font-extrabold tracking-wide">
-          {role === "SYSTEM_ADMIN" ? "System Admin" : username}
+          {/* {role === "SYSTEM_ADMIN" ? "System Admin" : username} */}
+          {username.toUpperCase()}
         </h1>
       </div>
 
       {/* Navigation Links */}
-      <nav className="flex flex-col gap-4 flex-grow">
+      {/* <nav className="flex flex-col gap-4 flex-grow"> */}
+      <nav className="flex flex-col gap-4 flex-grow overflow-y-auto px-6">
         {navList.map((item) => (
           <NavLink
             key={item.label}

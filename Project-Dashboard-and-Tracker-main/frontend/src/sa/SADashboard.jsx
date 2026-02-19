@@ -48,6 +48,20 @@ const SADashboard = () => {
     const [empProjects, setEmpProjects] = useState({});
     const [empCurrentPage, setEmpCurrentPage] = useState(1);
     const empRowsPerPage = 5;
+    const [searchTerm, setSearchTerm] = useState("");
+    const [selectedProject, setSelectedProject] = useState("");
+    const [selectedMonth, setSelectedMonth] = useState(
+        new Date().toISOString().slice(0, 7) // default current month
+    );
+
+    const [monthlyProjectHours, setMonthlyProjectHours] = useState([]);
+
+    const now = new Date();
+    const currentMonth =
+        now.getFullYear() + "-" +
+        String(now.getMonth() + 1).padStart(2, "0");
+
+
 
     useEffect(() => {
         const fetchDashboardData = async () => {
@@ -107,15 +121,57 @@ const SADashboard = () => {
         return projectHours.slice(start, start + rowsPerPage);
     }, [currentPage, projectHours]);
 
+    const filteredEmpProjects = useMemo(() => {
+        return Object.entries(empProjects).filter(([employeeKey, projects]) => {
+            const empName = employeeKey.split(" - ")[1] || "";
+
+            const matchesSearch =
+                empName.toLowerCase().includes(searchTerm.toLowerCase());
+
+            const matchesProject =
+                selectedProject === "" || projects[selectedProject] > 0;
+
+            return matchesSearch && matchesProject;
+        });
+    }, [empProjects, searchTerm, selectedProject]);
+
     const paginatedEmpProjects = useMemo(() => {
-        const entries = Object.entries(empProjects);
         const start = (empCurrentPage - 1) * empRowsPerPage;
-        return entries.slice(start, start + empRowsPerPage);
-    }, [empCurrentPage, empProjects]);
+        return filteredEmpProjects.slice(start, start + empRowsPerPage);
+    }, [empCurrentPage, filteredEmpProjects]);
 
     const empTotalPages = Math.ceil(
-        Object.keys(empProjects).length / empRowsPerPage
+        filteredEmpProjects.length / empRowsPerPage
     );
+
+    const visibleProjects = useMemo(() => {
+        if (!selectedProject) return projectNames;
+        return [selectedProject];
+    }, [selectedProject, projectNames]);
+
+    const fetchMonthlyProjectHours = async (month) => {
+        try {
+            const res = await api.get(`/dashboard/monthly-hours-by-employee-projects`, {
+                params: { month } // format: 2026-02
+            });
+
+            setMonthlyProjectHours(res.data.data);
+        } catch (error) {
+            console.error("Failed to fetch monthly hours:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchMonthlyProjectHours(selectedMonth);
+    }, [selectedMonth]);
+
+    const monthlyMap = useMemo(() => {
+        const map = {};
+        monthlyProjectHours.forEach(p => {
+            map[p.name] = p.durationMillis;
+        });
+        return map;
+    }, [monthlyProjectHours]);
 
 
     if (isLoading) return <div className="p-8">Loading Dashboard Analytics...</div>;
@@ -161,15 +217,28 @@ const SADashboard = () => {
                 </div>
 
                 <div className="bg-white p-6 rounded-lg shadow-md">
-                    <h3 className="font-bold mb-4 text-lg">Project Details</h3>
+                    {/* <h3 className="font-bold mb-4 text-lg">Project Details</h3> */}
                     <div className="flex justify-center">
                         <div className="w-full max-w-3xl overflow-x-auto">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="font-bold text-lg">Project Details</h3>
+
+                                <input
+                                    type="month"
+                                    value={selectedMonth}
+                                    max={currentMonth}
+                                    onChange={(e) => setSelectedMonth(e.target.value)}
+                                    className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+
                             <table className="min-w-full text-sm border border-gray-200 rounded-lg overflow-hidden">
 
                                 <thead className="bg-gray-100 text-gray-700">
                                     <tr>
                                         <th className="text-left px-4 py-2 border-b">Project Name</th>
-                                        <th className="text-right px-4 py-2 border-b">Hours Worked</th>
+                                        <th className="text-right px-4 py-2 border-b">Hours Worked(Monthly)</th>
+                                        <th className="text-right px-4 py-2 border-b">Hours Worked(Total)</th>
                                         <th className="text-right px-4 py-2 border-b">Estimated Hours</th>
                                     </tr>
                                 </thead>
@@ -183,6 +252,11 @@ const SADashboard = () => {
                                         >
                                             <td className="px-4 py-2 font-medium text-gray-800">
                                                 {row.name}
+                                            </td>
+                                            <td className="px-4 py-2 text-right font-semibold text-black-600">
+                                                {monthlyMap[row.name]
+                                                    ? formatMillis(monthlyMap[row.name])
+                                                    : "0m"}
                                             </td>
 
                                             <td className="px-4 py-2 text-right font-semibold text-indigo-600">
@@ -230,6 +304,36 @@ const SADashboard = () => {
 
                 </div>
             </div>
+            <div className="flex justify-between items-center mb-4 p-4">
+                <input
+                    type="text"
+                    placeholder="Search employee..."
+                    value={searchTerm}
+                    onChange={(e) => {
+                        setSearchTerm(e.target.value);
+                        setEmpCurrentPage(1); // reset to first page on search
+                    }}
+                    className="border border-gray-300 rounded px-3 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+
+                {/* Project Filter */}
+                <select
+                    value={selectedProject}
+                    onChange={(e) => {
+                        setSelectedProject(e.target.value);
+                        setEmpCurrentPage(1);
+                    }}
+                    className="border border-gray-300 rounded px-3 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                    <option value="">All Projects</option>
+                    {projectNames.map(project => (
+                        <option key={project} value={project}>
+                            {project}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-800">
@@ -238,7 +342,7 @@ const SADashboard = () => {
                                 Employee
                             </th>
 
-                            {projectNames.map(project => (
+                            {visibleProjects.map(project => (
                                 <th
                                     key={project}
                                     className="px-6 py-4 text-left text-sm font-semibold text-white"
@@ -263,7 +367,7 @@ const SADashboard = () => {
                                             {employeeKey.split(" - ")[1]}
                                         </Link>
                                     </td>
-                                    {projectNames.map(project => {
+                                    {visibleProjects.map(project => {
                                         const millis = projects[project] || 0;
                                         return (
                                             <td key={project} className="px-6 py-4">

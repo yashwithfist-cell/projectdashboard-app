@@ -2,17 +2,10 @@ import axios from "axios";
 
 const api = axios.create({
   // baseURL: "http://localhost:8091/api",
-  baseURL: "http://192.168.1.34:8080/api",
+  baseURL: "http://192.168.1.37:8080/api",
   headers: { "Content-Type": "application/json" },
   withCredentials: true
 });
-
-// const api = axios.create({
-//   baseURL: "http://192.168.1.254:8080/api",
-//   headers: { "Content-Type": "application/json" },
-//   withCredentials: true
-// });
-
 
 // Attach Basic Auth from active user
 api.interceptors.request.use((config) => {

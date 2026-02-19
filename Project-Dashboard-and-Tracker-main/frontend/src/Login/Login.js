@@ -11,44 +11,37 @@ function Login({ onLoginSuccess }) {
   const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError("");
+    e.preventDefault();
+    setError("");
 
-  try {
-    const credentials = btoa(`${username}:${password}`);
+    try {
+      const credentials = btoa(`${username}:${password}`);
 
-    // const res = await fetch("http://localhost:8091/user", {
-    //   method: "GET",
-    //   headers: {
-    //     Authorization: `Basic ${credentials}`,
-    //   },
-    // });
+      const res = await fetch("http://192.168.1.37:8080/user", {
+        method: "GET",
+        headers: {
+          Authorization: `Basic ${credentials}`,
+        },
+      });
 
-    const res = await fetch("http://192.168.1.34:8080/user", {
-      method: "GET",
-      headers: {
-        Authorization: `Basic ${credentials}`,
-      },
-    });
+      if (res.ok) {
+        const userData = await res.json();
 
-    if (res.ok) {
-      const userData = await res.json();
+        if (userData?.role) {
+          // ✔ Multi-user Auth: this will set activeUser and store user in users[]
+          login(username, password, userData.role);
 
-      if (userData?.role) {
-        // ✔ Multi-user Auth: this will set activeUser and store user in users[]
-        login(username, password, userData.role);
-
-        if (onLoginSuccess) onLoginSuccess();
+          if (onLoginSuccess) onLoginSuccess();
+        } else {
+          setError("Unable to verify role. Contact admin.");
+        }
       } else {
-        setError("Unable to verify role. Contact admin.");
+        setError("Invalid username or password");
       }
-    } else {
-      setError("Invalid username or password");
+    } catch (err) {
+      setError("Something went wrong. Please try again.");
     }
-  } catch (err) {
-    setError("Something went wrong. Please try again.");
-  }
-};
+  };
 
 
   return (

@@ -28,9 +28,7 @@ function createWindow() {
 
   if (isDev) {
     // Dev: load React dev server
-    mainWindow.loadURL("http://192.168.1.34:3000/#/");
-    // mainWindow.loadURL("http://192.168.1.254:3000/#/");
-    // mainWindow.loadURL("http://localhost:3001/#/");
+    mainWindow.loadURL("http://192.168.1.37:3000/#/");
     mainWindow.webContents.openDevTools();
   } else {
     // Prod: load the built React app
