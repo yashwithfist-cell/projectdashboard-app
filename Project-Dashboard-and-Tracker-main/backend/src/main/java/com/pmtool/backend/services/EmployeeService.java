@@ -9,6 +9,10 @@ import com.pmtool.backend.exception.EmployeeNotFoundException;
 import com.pmtool.backend.repository.DepartmentRepository;
 import com.pmtool.backend.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -116,6 +120,19 @@ public class EmployeeService {
 		Employee employee = employeeRepository.findByUsername(name)
 				.orElseThrow(() -> new EmployeeNotFoundException("Employee Not Found with username : " + name));
 		return new EmployeeResponseDTO(employee);
+	}
+
+	public Page<EmployeeResponseDTO> getEmployees(int page, int size, String sortField, String sortDir, String search) {
+		Sort sort = sortDir.equalsIgnoreCase("desc") ? Sort.by(sortField).descending() : Sort.by(sortField).ascending();
+		Pageable pageable = PageRequest.of(page, size, sort);
+
+		if (search != null && !search.isBlank()) {
+			return employeeRepository
+					.findByNameContainingIgnoreCaseOrEmployeeIdContainingIgnoreCase(search, search, pageable)
+					.map(EmployeeResponseDTO::new);
+		}
+
+		return employeeRepository.findAll(pageable).map(EmployeeResponseDTO::new);
 	}
 
 }

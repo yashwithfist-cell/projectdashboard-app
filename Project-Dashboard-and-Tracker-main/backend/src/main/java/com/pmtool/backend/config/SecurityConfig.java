@@ -89,7 +89,7 @@ public class SecurityConfig {
 //				"http://192.168.1.4:3000"
 //		));
 
-		configuration.setAllowedOrigins(Arrays.asList("http://192.168.1.34:3000", // LAN frontend
+		configuration.setAllowedOrigins(Arrays.asList("http://192.168.1.37:3000", // LAN frontend
 				"http://localhost:3000", "http://localhost:3001", // For local dev on server
 				"http://192.168.1.254:3000","http://192.168.1.34:3001"));
 

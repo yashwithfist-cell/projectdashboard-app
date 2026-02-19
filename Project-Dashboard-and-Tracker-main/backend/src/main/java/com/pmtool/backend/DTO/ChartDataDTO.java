@@ -1,5 +1,7 @@
 package com.pmtool.backend.DTO;
 
+import java.math.BigDecimal;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +15,8 @@ public class ChartDataDTO {
 	private String employeeId;
 	private String name;
 	private Double value;
+	private BigDecimal estimatedHours;
+	private Long projectId;
 
 //	public ChartDataDTO(String employeeId, String name, Double value) {
 //		this.name = name;
@@ -30,6 +34,14 @@ public class ChartDataDTO {
 
 	public String getEmployeeId() {
 		return employeeId;
+	}
+
+	public BigDecimal getEstimatedHours() {
+		return estimatedHours;
+	}
+
+	public Long getProjectId() {
+		return this.projectId;
 	}
 
 }

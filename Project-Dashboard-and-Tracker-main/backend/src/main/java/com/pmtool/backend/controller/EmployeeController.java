@@ -10,6 +10,7 @@ import com.pmtool.backend.services.EmployeeService;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,6 +31,16 @@ public class EmployeeController {
 	@PreAuthorize("hasAnyRole('SYSTEM_ADMIN','HUMAN_RESOURCE')")
 	public ResponseEntity<List<EmployeeResponseDTO>> getAllEmployees() {
 		return ResponseEntity.ok(employeeService.getAllEmployees());
+	}
+
+	@GetMapping("/getEmployees")
+	@PreAuthorize("hasAnyRole('SYSTEM_ADMIN','HUMAN_RESOURCE')")
+	public ResponseEntity<ApiResponse> getEmployees(@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "name") String sortField,
+			@RequestParam(defaultValue = "asc") String sortDir, @RequestParam(required = false) String search,
+			HttpServletRequest request) {
+		Page<EmployeeResponseDTO> employees = employeeService.getEmployees(page, size, sortField, sortDir, search);
+		return ResponseEntity.ok(ApiResponse.success(employees, "Employees Fetch Successful", request.getRequestURI()));
 	}
 
 	@PostMapping

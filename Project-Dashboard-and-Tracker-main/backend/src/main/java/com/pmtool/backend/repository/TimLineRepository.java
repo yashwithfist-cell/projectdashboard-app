@@ -17,11 +17,12 @@ public interface TimLineRepository extends JpaRepository<TimeLineSummary, String
 	public Optional<TimeLineSummary> findByStartTimeAndEndTimeAndEmployee_Username(LocalDateTime startTime,
 			LocalDateTime endTime, String username);
 
-	public Optional<List<TimeLineSummary>> findByDateAndEmployee_Username(LocalDate date,String name);
+	public Optional<List<TimeLineSummary>> findByDateAndEmployee_Username(LocalDate date, String name);
 
 	public Optional<TimeLineSummary> findByCurrentProject(boolean currentProject);
 
-	public List<TimeLineSummary> findByDateAndEmployeeEmployeeIdOrderByEndTimeAscStartTimeAsc(LocalDate date, String employeeId);
+	public List<TimeLineSummary> findByDateAndEmployeeEmployeeIdOrderByEndTimeAscStartTimeAsc(LocalDate date,
+			String employeeId);
 
 	@Query("""
 			SELECT t FROM TimeLineSummary t
@@ -34,10 +35,11 @@ public interface TimLineRepository extends JpaRepository<TimeLineSummary, String
 	@Query("""
 			SELECT new com.pmtool.backend.DTO.response.TimeLineResponseDto(
 			    t.project.name,
-			    SUM(t.durationMillis)
+			    SUM(t.durationMillis),
+			    t.project.estimatedHours
 			)
 			FROM TimeLineSummary t
-			GROUP BY t.project.name
+			GROUP BY t.project.name,t.project.estimatedHours
 			""")
 	public List<TimeLineResponseDto> findHoursByProject();
 
@@ -56,6 +58,39 @@ public interface TimLineRepository extends JpaRepository<TimeLineSummary, String
 	Optional<TimeLineSummary> findTopByEmployeeEmployeeIdAndDateOrderByEndTimeDesc(String employeeId, LocalDate date);
 
 	long countByEmployeeEmployeeIdAndDate(String employeeId, LocalDate date);
+
 	long deleteByEmployeeEmployeeIdAndDate(String employeeId, LocalDate date);
+
+	@Query("""
+			    SELECT new com.pmtool.backend.DTO.response.TimeLineResponseDto(
+			       t.employee.employeeId,
+			      t.employee.name,
+			      t.project.id,
+			      t.project.name,
+			      SUM(t.durationMillis)
+			    )
+			    FROM TimeLineSummary t
+			    WHERE t.type = 'Project' AND t.employee.role = com.pmtool.backend.enums.Role.EMPLOYEE
+			     GROUP BY
+			      t.employee.employeeId,
+			      t.employee.name,
+			      t.project.id,
+			      t.project.name
+			  ORDER BY
+			      t.employee.employeeId,
+			      t.project.name
+			""")
+	public List<TimeLineResponseDto> findHoursByEmployeeAndProject();
+
+	@Query("""
+			SELECT new com.pmtool.backend.DTO.response.TimeLineResponseDto(
+			    t.project.name,
+			    SUM(t.durationMillis)
+			)
+			FROM TimeLineSummary t
+			WHERE t.date BETWEEN :start AND :end
+			GROUP BY t.project.name
+			""")
+	public List<TimeLineResponseDto> findMonthlyHoursByProject(LocalDate start, LocalDate end);
 
 }

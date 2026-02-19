@@ -26,7 +26,8 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 			    p.name,
 			    p.clientName,
 			    COALESCE(SUM(a.totalWorkedSeconds), 0) / 3600.0,
-			    p.employee.employeeId
+			    p.employee.employeeId,
+			    p.estimatedHours
 			)
 			FROM Project p
 			LEFT JOIN p.assignments a

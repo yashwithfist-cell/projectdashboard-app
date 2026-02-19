@@ -2,6 +2,8 @@ package com.pmtool.backend.entity;
 
 import com.pmtool.backend.util.DurationToPostgresIntervalConverter;
 import jakarta.persistence.*;
+
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,9 +23,11 @@ public class Project {
 	@Column(name = "client_name")
 	private String clientName;
 
-	@Convert(converter = DurationToPostgresIntervalConverter.class)
-	@Column(name = "estimated_hours")
-	private Duration estimatedHours;
+//	@Convert(converter = DurationToPostgresIntervalConverter.class)
+//	@Column(name = "estimated_hours")
+//	private Duration estimatedHours;
+	@Column(name = "estimated_hours", precision = 5, scale = 2)
+	private BigDecimal estimatedHours;
 
 //    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 //    private Set<Discipline> disciplines;
@@ -77,11 +81,11 @@ public class Project {
 		this.clientName = clientName;
 	}
 
-	public Duration getEstimatedHours() {
+	public BigDecimal getEstimatedHours() {
 		return estimatedHours;
 	}
 
-	public void setEstimatedHours(Duration estimatedHours) {
+	public void setEstimatedHours(BigDecimal estimatedHours) {
 		this.estimatedHours = estimatedHours;
 	}
 

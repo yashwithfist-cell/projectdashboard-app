@@ -29,7 +29,7 @@ public class ProjectService {
 	private EmployeeRepository employeeRepository;
 
 	private ProjectDTO convertToDTO(Project project) {
-		return new ProjectDTO(project.getId(), project.getName(), project.getClientName());
+		return new ProjectDTO(project.getId(), project.getName(), project.getClientName(), project.getEstimatedHours());
 	}
 
 	@Transactional(readOnly = true)
@@ -42,6 +42,7 @@ public class ProjectService {
 		Project project = new Project();
 		project.setName(projectDTO.getName());
 		project.setClientName(projectDTO.getClientName());
+		project.setEstimatedHours(projectDTO.getEstimatedHours());
 		Employee employee = employeeRepository.findById(projectDTO.getProjectManagerId())
 				.orElseThrow(() -> new EmployeeNotFoundException(
 						"Project Manager Not Found with id : " + projectDTO.getProjectManagerId()));
@@ -57,7 +58,8 @@ public class ProjectService {
 			disciplineRepository.saveAll(disciplinesToUpdate);
 		}
 
-		return new ProjectDTO(savedProject.getId(), savedProject.getName(), savedProject.getClientName());
+		return new ProjectDTO(savedProject.getId(), savedProject.getName(), savedProject.getClientName(),
+				savedProject.getEstimatedHours());
 	}
 
 	@Transactional
@@ -67,6 +69,7 @@ public class ProjectService {
 
 		existingProject.setName(projectDTO.getName());
 		existingProject.setClientName(projectDTO.getClientName());
+		existingProject.setEstimatedHours(projectDTO.getEstimatedHours());
 		Employee employee = employeeRepository.findById(projectDTO.getProjectManagerId())
 				.orElseThrow(() -> new EmployeeNotFoundException(
 						"Project Manager Not Found with id : " + projectDTO.getProjectManagerId()));
@@ -85,7 +88,8 @@ public class ProjectService {
 		// often involving clearing old associations and setting new ones)
 		// For now, we will focus on the create logic.
 
-		return new ProjectDTO(updatedProject.getId(), updatedProject.getName(), updatedProject.getClientName());
+		return new ProjectDTO(updatedProject.getId(), updatedProject.getName(), updatedProject.getClientName(),
+				updatedProject.getEstimatedHours());
 	}
 
 	@Transactional

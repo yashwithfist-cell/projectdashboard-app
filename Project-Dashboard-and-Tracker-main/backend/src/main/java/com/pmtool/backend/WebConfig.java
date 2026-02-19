@@ -15,7 +15,7 @@ public class WebConfig {
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/**") // Allow all endpoints
 //                        .allowedOrigins("http://localhost:3000", "http://192.168.1.4:3000")
-						.allowedOrigins("http://192.168.1.34:3000","http://192.168.1.254:3000","http://localhost:3000","http://localhost:3001","http://192.168.1.34:3001")// Your React frontend
+						.allowedOrigins("http://192.168.1.37:3000","http://192.168.1.254:3000","http://localhost:3000","http://localhost:3001","http://192.168.1.34:3001")// Your React frontend
 						.allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS").allowedHeaders("*")
 						.allowCredentials(true);
 			}
