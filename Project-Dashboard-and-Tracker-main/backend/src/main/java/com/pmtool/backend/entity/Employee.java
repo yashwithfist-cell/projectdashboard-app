@@ -1,5 +1,6 @@
 package com.pmtool.backend.entity;
 
+import com.pmtool.backend.enums.AccountStatus;
 import com.pmtool.backend.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -15,9 +16,9 @@ import java.util.Set;
 @Entity
 @Table(name = "employees")
 @Data
-@Builder
+//@Builder
 @NoArgsConstructor
-@AllArgsConstructor
+//@AllArgsConstructor
 public class Employee {
 
 	@Id
@@ -83,5 +84,16 @@ public class Employee {
 
 	@Column(name = "employee_device_code")
 	private String empDeviceCode;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "status")
+	private AccountStatus status = AccountStatus.ACTIVE;
+
+	@PrePersist
+	public void setDefaultStatus() {
+		if (this.status == null) {
+			this.status = AccountStatus.ACTIVE;
+		}
+	}
 
 }

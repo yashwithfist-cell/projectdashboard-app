@@ -4,6 +4,7 @@ import com.pmtool.backend.DTO.CreateEmployeeDTO;
 import com.pmtool.backend.DTO.EmployeeResponseDTO;
 import com.pmtool.backend.DTO.UpdateEmployeeDTO;
 import com.pmtool.backend.DTO.response.ApiResponse;
+import com.pmtool.backend.enums.AccountStatus;
 import com.pmtool.backend.enums.Role;
 import com.pmtool.backend.services.EmployeeService;
 
@@ -29,18 +30,8 @@ public class EmployeeController {
 
 	@GetMapping
 	@PreAuthorize("hasAnyRole('SYSTEM_ADMIN','HUMAN_RESOURCE')")
-	public ResponseEntity<List<EmployeeResponseDTO>> getAllEmployees() {
-		return ResponseEntity.ok(employeeService.getAllEmployees());
-	}
-
-	@GetMapping("/getEmployees")
-	@PreAuthorize("hasAnyRole('SYSTEM_ADMIN','HUMAN_RESOURCE')")
-	public ResponseEntity<ApiResponse> getEmployees(@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "name") String sortField,
-			@RequestParam(defaultValue = "asc") String sortDir, @RequestParam(required = false) String search,
-			HttpServletRequest request) {
-		Page<EmployeeResponseDTO> employees = employeeService.getEmployees(page, size, sortField, sortDir, search);
-		return ResponseEntity.ok(ApiResponse.success(employees, "Employees Fetch Successful", request.getRequestURI()));
+	public ResponseEntity<List<EmployeeResponseDTO>> getAllEmployees(@RequestParam(required = false) String search) {
+		return ResponseEntity.ok(employeeService.getAllEmployees(search));
 	}
 
 	@PostMapping
@@ -90,5 +81,14 @@ public class EmployeeController {
 			HttpServletRequest request) {
 		return ResponseEntity.ok(ApiResponse.success(employeeService.getEmployeeByUsername(authentication.getName()),
 				"Employee Data Fetched Successfully", request.getRequestURI()));
+	}
+
+	@PutMapping("/account/status/{employeeId}/{newStatus}")
+	@PreAuthorize("hasAnyRole('SYSTEM_ADMIN','HUMAN_RESOURCE')")
+	public ResponseEntity<ApiResponse> updateAccountStatus(@PathVariable String employeeId,@PathVariable AccountStatus newStatus, HttpServletRequest request) {
+		EmployeeResponseDTO employeeStatus = employeeService.updateAccountStatus(newStatus, employeeId);
+		return ResponseEntity.ok(ApiResponse.success(employeeStatus,
+				"Employee account status updated with id : " + employeeId,
+				request.getRequestURI()));
 	}
 }

@@ -1,6 +1,7 @@
 package com.pmtool.backend.DTO;
 
 import com.pmtool.backend.entity.Employee;
+import com.pmtool.backend.enums.AccountStatus;
 import com.pmtool.backend.enums.Role;
 
 import lombok.AllArgsConstructor;
@@ -43,6 +44,7 @@ public class EmployeeResponseDTO {
 	private String managerName;
 	private String leadName;
 	private String empDeviceCode;
+	private String status;
 
 	public EmployeeResponseDTO(Employee employee) {
 		this.employeeId = employee.getEmployeeId();
@@ -60,6 +62,7 @@ public class EmployeeResponseDTO {
 		this.managerName = employee.getMgrName();
 		this.leadName = employee.getTeamLeadName();
 		this.empDeviceCode = employee.getEmpDeviceCode();
+		this.status = employee.getStatus().name();
 		// Map all the new fields
 	}
 }

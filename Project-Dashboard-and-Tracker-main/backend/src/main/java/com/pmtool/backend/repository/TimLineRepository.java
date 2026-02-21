@@ -77,7 +77,7 @@ public interface TimLineRepository extends JpaRepository<TimeLineSummary, String
 			      t.project.id,
 			      t.project.name
 			  ORDER BY
-			      t.employee.employeeId,
+			      t.employee.name,
 			      t.project.name
 			""")
 	public List<TimeLineResponseDto> findHoursByEmployeeAndProject();

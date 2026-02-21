@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -30,7 +31,28 @@ public interface EmployeeRepository extends JpaRepository<Employee, String> {
 
 	Employee findByEmpDeviceCode(String empDeviceCode);
 
-	Page<Employee> findByNameContainingIgnoreCaseOrEmployeeIdContainingIgnoreCase(String name, String employeeId,
-			Pageable pageable);
+	List<Employee> findByNameContainingIgnoreCaseOrEmployeeIdContainingIgnoreCase(String name, String employeeId);
+
+//	@Query(value = """
+//			SELECT * FROM employees e
+//			WHERE LOWER(e.employee_name) LIKE LOWER(CONCAT('%', :search, '%'))
+//			   OR LOWER(e.employee_id) LIKE LOWER(CONCAT('%', :search, '%'))
+//			ORDER BY
+//			   REGEXP_REPLACE(e.employee_id, '\\d+', '') ASC,
+//			   CAST(REGEXP_REPLACE(e.employee_id, '\\D+', '', 'g') AS INTEGER) ASC
+//			""", countQuery = """
+//			SELECT COUNT(*) FROM employees e
+//			WHERE LOWER(e.employee_name) LIKE LOWER(CONCAT('%', :search, '%'))
+//			   OR LOWER(e.employee_id) LIKE LOWER(CONCAT('%', :search, '%'))
+//			""", nativeQuery = true)
+//	Page<Employee> searchEmployeesSorted(@Param("search") String search, Pageable pageable);
+//
+//	@Query(value = """
+//			SELECT * FROM employees e
+//			ORDER BY
+//			    REGEXP_REPLACE(e.employee_id, '\\d+', '') ASC,
+//			    CAST(REGEXP_REPLACE(e.employee_id, '\\D+', '', 'g') AS INTEGER) ASC
+//			""", countQuery = "SELECT COUNT(*) FROM employees", nativeQuery = true)
+//	Page<Employee> findAllSorted(Pageable pageable);
 
 }

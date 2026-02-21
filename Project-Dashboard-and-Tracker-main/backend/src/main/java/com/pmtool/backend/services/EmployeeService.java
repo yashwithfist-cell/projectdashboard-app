@@ -4,6 +4,7 @@ import com.pmtool.backend.DTO.CreateEmployeeDTO;
 import com.pmtool.backend.DTO.EmployeeResponseDTO;
 import com.pmtool.backend.entity.Department;
 import com.pmtool.backend.entity.Employee;
+import com.pmtool.backend.enums.AccountStatus;
 import com.pmtool.backend.enums.Role;
 import com.pmtool.backend.exception.EmployeeNotFoundException;
 import com.pmtool.backend.repository.DepartmentRepository;
@@ -13,11 +14,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import com.pmtool.backend.DTO.CreateEmployeeDTO; // You will need to update this DTO
 import com.pmtool.backend.DTO.UpdateEmployeeDTO; // You will need to create this DTO
+
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,10 +34,8 @@ public class EmployeeService {
 
 	@Autowired
 	private EmployeeRepository employeeRepository;
-	@Autowired
-	private PasswordEncoder passwordEncoder;
 
-	@Autowired // <-- FIX: You were missing this injection
+	@Autowired
 	private DepartmentRepository departmentRepository;
 
 	@Transactional
@@ -40,32 +46,42 @@ public class EmployeeService {
 		Department department = departmentRepository.findById(dto.getDepartmentId())
 				.orElseThrow(() -> new RuntimeException("Department not found"));
 
-		Employee newEmployee = Employee.builder().employeeId(dto.getEmployeeId()).name(dto.getName())
-				.username(dto.getUsername()).password(dto.getPassword()).role(dto.getRole()).department(department)
-				.joinDate(dto.getJoinDate()).bankAccountNo(dto.getBankAccountNo()).bankName(dto.getBankName())
-				.salary(dto.getSalary()).location(dto.getLocation()).profPeriodEndDate(dto.getProfPeriodEndDate())
-				.mailId(dto.getMailId()).mgrName(dto.getManagerName()).teamLeadName(dto.getLeadName())
-				.empDeviceCode(dto.getEmpDeviceCode()).build();
-//        newEmployee.setEmployeeId(dto.getEmployeeId());
-//        newEmployee.setName(dto.getName());
-//        newEmployee.setUsername(dto.getUsername());
-//        newEmployee.setPassword(dto.getPassword());
-//        newEmployee.setRole(dto.getRole());
-//        newEmployee.setDepartment(department);
+		Employee newEmployee = new Employee();
+		newEmployee.setEmployeeId(dto.getEmployeeId());
+		newEmployee.setName(dto.getName());
+		newEmployee.setUsername(dto.getUsername());
+		newEmployee.setPassword(dto.getPassword());
+		newEmployee.setRole(dto.getRole());
+		newEmployee.setDepartment(department);
+		newEmployee.setJoinDate(dto.getJoinDate());
+		newEmployee.setBankAccountNo(dto.getBankAccountNo());
+		newEmployee.setBankName(dto.getBankName());
+		newEmployee.setSalary(dto.getSalary());
+		newEmployee.setLocation(dto.getLocation());
+		newEmployee.setProfPeriodEndDate(dto.getProfPeriodEndDate());
+		newEmployee.setMailId(dto.getMailId());
+		newEmployee.setMgrName(dto.getManagerName());
+		newEmployee.setTeamLeadName(dto.getLeadName());
+		newEmployee.setEmpDeviceCode(dto.getEmpDeviceCode());
 
 		Employee savedEmployee = employeeRepository.save(newEmployee);
 		return new EmployeeResponseDTO(savedEmployee);
 	}
 
-	// <-- FIX: The duplicate method is now removed. This is the only
-	// getAllEmployees() method.
-	@Transactional(readOnly = true) // <-- FIX: Correct annotation syntax
-	public List<EmployeeResponseDTO> getAllEmployees() {
-		return employeeRepository.findAll().stream().map(EmployeeResponseDTO::new).collect(Collectors.toList());
+	@Transactional(readOnly = true)
+	public List<EmployeeResponseDTO> getAllEmployees(String search) {
+		if (search != null && !search.isBlank()) {
+			return employeeRepository.findByNameContainingIgnoreCaseOrEmployeeIdContainingIgnoreCase(search, search)
+					.stream().sorted(Comparator.comparing((Employee e) -> getPriority(e.getEmployeeId()))
+							.thenComparing(Employee::getEmployeeId))
+					.map(EmployeeResponseDTO::new).toList();
+		}
+		List<EmployeeResponseDTO> empResList = employeeRepository.findAll().stream().sorted(Comparator
+				.comparing((Employee e) -> getPriority(e.getEmployeeId())).thenComparing(Employee::getEmployeeId))
+				.map(EmployeeResponseDTO::new).toList();
+		return empResList;
 	}
 
-	// --- We will add the deleteEmployee method here in the next step to fix the
-	// controller error ---
 	@Transactional
 	public void deleteEmployee(String employeeId) {
 		if (!employeeRepository.existsById(employeeId)) {
@@ -122,17 +138,22 @@ public class EmployeeService {
 		return new EmployeeResponseDTO(employee);
 	}
 
-	public Page<EmployeeResponseDTO> getEmployees(int page, int size, String sortField, String sortDir, String search) {
-		Sort sort = sortDir.equalsIgnoreCase("desc") ? Sort.by(sortField).descending() : Sort.by(sortField).ascending();
-		Pageable pageable = PageRequest.of(page, size, sort);
+	public EmployeeResponseDTO updateAccountStatus(AccountStatus newStatus, String employeeId) {
+		Employee employee = employeeRepository.findById(employeeId)
+				.orElseThrow(() -> new UsernameNotFoundException("Employee not found with id : " + employeeId));
+		employee.setStatus(newStatus);
+		Employee employeeResponse = employeeRepository.save(employee);
+		return new EmployeeResponseDTO(employeeResponse);
+	}
 
-		if (search != null && !search.isBlank()) {
-			return employeeRepository
-					.findByNameContainingIgnoreCaseOrEmployeeIdContainingIgnoreCase(search, search, pageable)
-					.map(EmployeeResponseDTO::new);
+	private int getPriority(String id) {
+		if (id.startsWith("FES") && !id.startsWith("FEST")) {
+			return 1; // First group
+		} else if (id.startsWith("FEST")) {
+			return 2; // Second group
+		} else {
+			return 3; // Others
 		}
-
-		return employeeRepository.findAll(pageable).map(EmployeeResponseDTO::new);
 	}
 
 }

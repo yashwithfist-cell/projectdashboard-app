@@ -39,6 +39,7 @@ public class AuthController {
         userInfo.put("role", employee.getRole().name());
         userInfo.put("employeeName", employee.getName()); // <-- FIXED
         userInfo.put("employeeId", employee.getEmployeeId());
+        userInfo.put("status", employee.getStatus().name());
 
         return ResponseEntity.ok(userInfo);
     }

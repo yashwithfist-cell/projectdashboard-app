@@ -32,7 +32,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 			FROM Project p
 			LEFT JOIN p.assignments a
 			GROUP BY p.id, p.name, p.clientName, p.employee.employeeId
-			ORDER BY p.name
+			ORDER BY p.id
 			""")
 
 	List<ProjectResponseDTO> findAllWithHoursConsumed();
