@@ -253,7 +253,7 @@ const SuperAdminMilestones = () => {
                             <div className="flex flex-col gap-2">
                                 {disciplines
                                     .filter(d => d.milestoneId === milestone.milestoneId)
-                                    .map(d => (
+                                    .map((d,index) => (
                                         <div
                                             key={d.id}
                                             className="flex items-center justify-between bg-gray-100 px-3 py-2 rounded-lg"
@@ -264,7 +264,7 @@ const SuperAdminMilestones = () => {
                                                 onClick={() => openFolder(projectId)}
                                                 className="text-blue-700 font-semibold cursor-pointer hover:underline"
                                             >
-                                                {d.name}
+                                                {(index+1)+'. '+d.name}
                                             </span>
 
                                             {/* <button onClick={() => openFolder(projectId)}>
@@ -275,13 +275,13 @@ const SuperAdminMilestones = () => {
                                             <div className="flex gap-2">
                                                 <button
                                                     onClick={() => handleDisciplineEditModal(d)}
-                                                    className="bg-green-500 hover:bg-green-600 text-white px-2 py-0.5 rounded-lg text-sm"
+                                                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-0.5 rounded-lg text-sm"
                                                 >
                                                     Edit
                                                 </button>
                                                 <button
                                                     onClick={() => handleDisciplineDelete(d.id)}
-                                                    className="bg-purple-600 hover:bg-purple-700 text-white px-2 py-0.5 rounded-lg text-sm"
+                                                    className="bg-red-600 hover:bg-red-700 text-white px-2 py-0.5 rounded-lg text-sm"
                                                 >
                                                     Delete
                                                 </button>
@@ -296,7 +296,7 @@ const SuperAdminMilestones = () => {
                             <button onClick={() => handleDelete(milestone.milestoneId)} className="bg-red-600 hover:bg-red-700 text-white text-xs font-medium px-4 py-1.5 rounded-lg">Delete</button>
                             <button
                                 onClick={() => handleDisciplineOpenModal(milestone)}
-                                className="bg-blue-500 hover:bg-blue-600 text-white text-xs font-medium px-4 py-1.5 rounded-lg"
+                                className="bg-green-600 hover:bg-green-700 text-white text-xs font-medium px-4 py-1.5 rounded-lg"
                             >
                                 + Add Discipline
                             </button>

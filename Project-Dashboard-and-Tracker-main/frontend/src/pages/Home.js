@@ -16,7 +16,7 @@ function Home() {
     console.log("Current role:", role);
 
     if (role === "SYSTEM_ADMIN") {
-      navigate("/saprojects", { replace: true });
+      navigate("/sadashboard", { replace: true });
     } else if (role === "SUPER_ADMIN") {
       navigate("/superadminprojects", { replace: true });
     } else if (role === "HUMAN_RESOURCE") {

@@ -13,7 +13,10 @@ export default function ProjectGraph({
   const DAY_START = 0;
   const DAY_END = 24 * 60 - 1;
   const DAY_TOTAL = DAY_END - DAY_START;
-  const nowMinutes = new Date().getHours() * 60 + new Date().getMinutes();
+  // const nowMinutes = new Date().getHours() * 60 + new Date().getMinutes();
+  const [nowMinutes, setNowMinutes] = useState(
+    new Date().getHours() * 60 + new Date().getMinutes()
+  );
 
   const WORKING_COLOR = "#10B981";
   const IDLE_COLOR = "#F59E0B";
@@ -26,16 +29,40 @@ export default function ProjectGraph({
     const saved = parseInt(localStorage.getItem("timelineCurrentPage"), 10);
     return !isNaN(saved) && saved > 0 ? saved : 1;
   });
-  const [today, setToday] = useState('');
+  // const [today, setToday] = useState('');
+  const today = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
-    logs.filter(project => project.date != today).map(project => project.startTime = firstCheckIn)
-  }, [logs, firstCheckIn]);
+    const interval = setInterval(() => {
+      const now = new Date();
+      setNowMinutes(now.getHours() * 60 + now.getMinutes());
+    }, 30000); // update every 30 seconds
 
-  useEffect(() => {
-    const date = new Date().toISOString().split('T')[0];
-    setToday(date);
+    return () => clearInterval(interval);
   }, []);
+
+
+  // useEffect(() => {
+  //   logs.filter(project => project.date != today).map(project => project.startTime = firstCheckIn)
+  // }, [logs, firstCheckIn]);
+
+  const adjustedLogs = useMemo(() => {
+    return logs.map(project => {
+      if (project.date !== today) {
+        return {
+          ...project,
+          startTime: firstCheckIn
+        };
+      }
+      return project;
+    });
+  }, [logs, firstCheckIn, today]);
+
+
+  // useEffect(() => {
+  //   const date = new Date().toISOString().split('T')[0];
+  //   setToday(date);
+  // }, []);
 
 
   // useEffect(() => {
@@ -123,7 +150,7 @@ export default function ProjectGraph({
           : nowMinutes;
 
       const workEnd = outMin ?? nowMinutes;
-      logs.forEach((project, pIdx) => {
+      adjustedLogs.forEach((project, pIdx) => {
         const projectStartMin = toMinutes(project.startTime);
         const projectEndMin = project.endTime
           ? toMinutes(project.endTime)
@@ -191,7 +218,15 @@ export default function ProjectGraph({
   };
 
 
-  const { blocks } = buildTimelineBlocks();
+  // const { blocks } = buildTimelineBlocks();
+  const { blocks } = useMemo(() => buildTimelineBlocks(), [
+    checkIns,
+    checkOuts,
+    idleLogs,
+    adjustedLogs,
+    nowMinutes
+  ]);
+
 
   const buildTimelineTableRows = () => {
     const rows = [];
@@ -242,7 +277,7 @@ export default function ProjectGraph({
       // ------------------------------------------------
       // Iterate projects → subtract idle
       // ------------------------------------------------
-      logs.forEach((project, pIdx) => {
+      adjustedLogs.forEach((project, pIdx) => {
         const projStart = toMinutes(project.startTime);
         const projEnd = project.endTime ? toMinutes(project.endTime) : nowMinutes;
         const color = PROJECT_PALETTE[pIdx % PROJECT_PALETTE.length];
@@ -285,7 +320,7 @@ export default function ProjectGraph({
   };
   const tableRows = useMemo(() => {
     return buildTimelineTableRows();
-  }, [checkIns, checkOuts, idleLogs, logs]);
+  }, [checkIns, checkOuts, idleLogs, adjustedLogs, nowMinutes]);
 
   useEffect(() => {
     const totalPages = Math.ceil(tableRows.length / ROWS_PER_PAGE) || 1;

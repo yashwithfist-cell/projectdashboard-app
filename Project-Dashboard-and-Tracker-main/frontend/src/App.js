@@ -6,7 +6,7 @@ import { AuthProvider, useAuth } from "./context/AuthContext.js";
 import Login from "./Login/Login.js";
 import Home from "./pages/Home.js";
 
-import SALayout from "./layout/SALayout.js";
+import SALayout from "./layout/SALayout.jsx";
 import SADashboard from "./sa/SADashboard.jsx";
 import MilestoneDataReport from "./sa/MilestoneDataReport.js";
 import SAProjects from "./sa/SAProjects.jsx";
@@ -33,6 +33,9 @@ import SuperAdminProjects from "./superadmin/SuperAdminProjects.jsx";
 import SuperAdminMilestones from "./superadmin/SuperAdminMilestones.jsx";
 import SuperAdminDisciplines from "./superadmin/SuperAdminDisciplines.jsx";
 import SAEmpTimeine from "./sa/SAEmpTimeline.jsx";
+import SAAdmin from "./sa/SAAdmin.jsx";
+import SAProjectData from "./sa/SAProjectData.jsx";
+import SAEmpData from "./sa/SAEmpData.jsx";
 
 
 // 🔒 NEW — Protected Route for Multi-User
@@ -79,7 +82,10 @@ function AppContent() {
           }
         >
           <Route path="/sadashboard" element={<SADashboard />} />
+          <Route path="/saadmin" element={<SAAdmin />} />
           <Route path="/saprojects" element={<SuperAdminProjects />} />
+          <Route path="/saprojectdata" element={<SAProjectData />} />
+          <Route path="/saempdata" element={<SAEmpData />} />
           {/* <Route path="/samilestones" element={<SAMilestones />} /> */}
           {/* <Route path="/sadisciplines" element={<SADisciplines />} /> */}
           <Route path="/saemployees" element={<SAEmployees />} />
@@ -93,7 +99,7 @@ function AppContent() {
           <Route path="/tlnotification" element={<EmpNotification />} />
           <Route path="/mgrprojassignment" element={<MgrProjAssignment />} />
           <Route path="/mgrprojects" element={<MgrProjects />} />
-           <Route path="/hrprojects" element={<SuperAdminProjects />} />
+          <Route path="/hrprojects" element={<SuperAdminProjects />} />
           <Route path="/hremployees" element={<SAEmployees />} />
           <Route path="/hrdashboard" element={<SADashboard />} />
           <Route path="/hrleaveapproval" element={<SALeaveApproval />} />

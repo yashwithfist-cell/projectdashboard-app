@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../utils/api';
+import { useNavigate } from "react-router-dom";
 
 // API helpers (can be in this file or a separate api service file)
 export const getEmployees = () => api.get('/employees');
@@ -49,6 +50,7 @@ const EmployeeDetailModal = ({ employee, onClose }) => {
 
 // --- MAIN COMPONENT ---
 const SAEmployees = () => {
+  const navigate = useNavigate();
   const [employees, setEmployees] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -68,6 +70,8 @@ const SAEmployees = () => {
   const [search, setSearch] = useState("");
   const [sortField, setSortField] = useState("name");
   const [sortDir, setSortDir] = useState("asc");
+  const [status, setStatus] = useState({ status: "", employeeId: "" });
+  const [loadingId, setLoadingId] = useState(null);
 
 
   // SIMPLIFIED state for adding a new employee
@@ -126,7 +130,7 @@ const SAEmployees = () => {
     fetchEmployees();
     api.get('/departments').then(res => setDepartments(res.data));
     fetchRoles();
-  }, [page, sortField, sortDir, search]);
+  }, [search]);
 
 
   const fetchRoles = async () => {
@@ -151,19 +155,21 @@ const SAEmployees = () => {
 
   const fetchEmployees = async () => {
     try {
-      const res = await api.get("/employees/getEmployees", {
-        params: {
-          page,
-          size,
-          sortField,
-          sortDir,
-          search
-        }
-      });
+      // const res = await api.get("/employees/getEmployees", {
+      //   params: {
+      //     page,
+      //     size,
+      //     sortField,
+      //     sortDir,
+      //     search
+      //   }
+      // });
+      const res = await api.get("/employees", { params: { search } });
 
-      setEmployees(res.data.data.content);
-      setTotalPages(res.data.data.totalPages);
-      setTotalElements(res.data.data.totalElements);
+      // setEmployees(res.data.data.content);
+      setEmployees(res.data);
+      // setTotalPages(res.data.data.totalPages);
+      // setTotalElements(res.data.data.totalElements);
 
     } catch (err) {
       console.error("Failed to fetch employees:", err);
@@ -263,11 +269,46 @@ const SAEmployees = () => {
     }
   };
 
+  const toggleStatus = async (emp) => {
+    const newStatus =
+      emp.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+
+    try {
+      setLoadingId(emp.employeeId);
+
+      await api.put(
+        `/employees/account/status/${emp.employeeId}/${newStatus}`
+      );
+
+      // Update only that employee in UI
+      setEmployees(prev =>
+        prev.map(e =>
+          e.employeeId === emp.employeeId
+            ? { ...e, status: newStatus }
+            : e
+        )
+      );
+
+    } catch (error) {
+      console.error("Error updating status:", error);
+      alert("Failed to update status");
+    } finally {
+      setLoadingId(null);
+    }
+  };
+
   return (
-    <div className="p-6 bg-gray-50 min-h-screen w-full">
+    <div className="pt-2 px-6 pb-6 bg-gray-50 min-h-screen w-full">
       <div className="w-full mx-auto bg-white p-3 rounded-md shadow-sm">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">All Employees</h2>
+        <div className="flex items-center justify-between mb-1">
+          <h2 className="text-2xl font-bold text-gray-800">Employees</h2>
+          <button
+            onClick={() => navigate(-1)}
+            className="bg-white hover:bg-gray-100 
+                       text-blue-600 font-semibold 
+                       px-4 py-2 rounded-lg transition">
+            ← Back
+          </button>
           <button
             className="px-4 py-2 bg-green-600 text-white font-bold rounded-lg shadow-sm hover:bg-green-700 transition-colors"
             onClick={() => setShowAddModal(true)}
@@ -282,7 +323,7 @@ const SAEmployees = () => {
               placeholder="Search by Name or ID..."
               value={search}
               onChange={(e) => {
-                setPage(0);
+                // setPage(0);
                 setSearch(e.target.value);
               }}
               className="border px-3 py-2 rounded-md text-sm w-64"
@@ -292,51 +333,46 @@ const SAEmployees = () => {
           <table className="min-w-full w-full table-fixed text-xs divide-y divide-gray-200">
             <thead className="bg-gray-100">
               <tr>
-                <th className="px-2 py-1 text-left text-[11px] font-semibold text-gray-500 uppercase truncate">Employee ID</th>
-                {/* <th className="px-2 py-1 text-left text-[11px] font-semibold text-gray-500 uppercase truncate">Name</th> */}
-                <th
-                  onClick={() => {
-                    setSortField("name");
-                    setSortDir(sortDir === "asc" ? "desc" : "asc");
-                  }}
-                  className="px-2 py-1 text-left text-[11px] font-semibold text-gray-500 uppercase truncate cursor-pointer"
-                >
-                  Name {sortField === "name" ? (sortDir === "asc" ? "▲" : "▼") : ""}
-                </th>
-
-                <th className="px-2 py-1 text-left text-[11px] font-semibold text-gray-500 uppercase truncate">Department</th>
-                {/* <th className="px-2 py-1 text-left text-[11px] font-semibold text-gray-500 uppercase truncate">Role</th> */}
-                {/* <th className="px-2 py-1 text-left text-[11px] font-semibold text-gray-500 uppercase truncate">Bank Account Number</th> */}
-                {/* <th className="px-2 py-1 text-left text-[11px] font-semibold text-gray-500 uppercase truncate">Bank Name</th> */}
-                <th className="px-2 py-1 text-left text-[11px] font-semibold text-gray-500 uppercase truncate">Address</th>
-                {/* <th className="px-2 py-1 text-left text-[11px] font-semibold text-gray-500 uppercase truncate">Monthly Salary (In LAKHS)</th> */}
-                {/* <th className="px-2 py-1 text-left text-[11px] font-semibold text-gray-500 uppercase truncate">Email ID</th> */}
-                <th className="px-2 py-1 text-left text-[11px] font-semibold text-gray-500 uppercase truncate">Probation End Date</th>
-                <th className="px-2 py-1 text-left text-[11px] font-semibold text-gray-500 uppercase truncate">Manager Name</th>
-                <th className="px-2 py-1 text-left text-[11px] font-semibold text-gray-500 uppercase truncate">Team Lead Name</th>
-                <th className="px-2 py-1 text-left text-[11px] font-semibold text-gray-500 uppercase truncate">Actions</th>
+                <th className="px-3 py-2 text-left text-[11px] font-semibold text-gray-500 uppercase truncate">ID</th>
+                <th className="px-3 py-2 text-left text-[11px] font-semibold text-gray-500 uppercase truncate">Name</th>
+                <th className="px-3 py-2 text-left text-[11px] font-semibold text-gray-500 uppercase truncate text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {employees.map(emp => (
+              {employees.map((emp) => (
                 <tr key={emp.employeeId} className="hover:bg-gray-50">
                   <td className="px-2 py-1 text-gray-700 text-xs truncate">{emp.employeeId}</td>
                   <td className="px-2 py-1 text-gray-700 text-xs truncate">{emp.name}</td>
-                  <td className="px-2 py-1 text-gray-700 text-xs truncate">{emp.departmentName}</td>
-                  {/* <td className="px-2 py-1 text-gray-700 text-xs truncate"><span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">{emp.role}</span></td> */}
-                  {/* <td className="px-2 py-1 text-gray-700 text-xs truncate">{emp.bankAccountNo}</td> */}
-                  {/* <td className="px-2 py-1 text-gray-700 text-xs truncate">{emp.bankName}</td> */}
-                  <td className="px-2 py-1 text-gray-700 text-xs truncate">{emp.location}</td>
-                  {/* <td className="px-2 py-1 text-gray-700 text-xs truncate">{emp.salary}</td> */}
-                  {/* <td className="px-2 py-1 text-gray-700 text-xs truncate">{emp.mailId}</td> */}
-                  <td className="px-2 py-1 text-gray-700 text-xs truncate">{emp.profPeriodEndDate}</td>
-                  <td className="px-2 py-1 text-gray-700 text-xs truncate">{emp.managerName}</td>
-                  <td className="px-2 py-1 text-gray-700 text-xs truncate">{emp.leadName}</td>
                   <td className="px-3 py-2 text-center">
                     <div className="flex justify-center items-center space-x-2">
                       <button onClick={() => handleView(emp)} className="bg-blue-600 text-white text-xs px-2 py-1 rounded hover:bg-blue-700">View</button>
                       <button onClick={() => handleEdit(emp)} className="bg-yellow-500 text-white text-xs px-2 py-1 rounded hover:bg-yellow-600">Edit</button>
-                      <button onClick={() => handleDelete(emp.employeeId)} className="bg-red-600 text-white text-xs px-2 py-1 rounded hover:bg-red-700">Delete</button>
+                      <button
+                        onClick={() => toggleStatus(emp)}
+                        disabled={loadingId === emp.employeeId}
+                        className={`flex items-center justify-center gap-2 w-[110px] px-2 py-0.5 rounded-full text-xs font-semibold transition
+    ${emp.status === "ACTIVE"
+                            ? "bg-green-100 text-green-700 border border-green-500 hover:bg-green-200"
+                            : "bg-red-100 text-red-700 border border-red-500 hover:bg-red-200"
+                          }
+    ${loadingId === emp.employeeId
+                            ? "opacity-60 cursor-not-allowed"
+                            : ""
+                          }
+  `}
+                      >
+                        <span
+                          className={`w-2 h-2 rounded-full ${emp.status === "ACTIVE"
+                            ? "bg-green-600"
+                            : "bg-red-600"
+                            }`}
+                        ></span>
+
+                        {loadingId === emp.employeeId
+                          ? "Updating..."
+                          : emp.status}
+                      </button>
+                      {/* <button onClick={() => handleDelete(emp.employeeId)} className="bg-red-600 text-white text-xs px-2 py-1 rounded hover:bg-red-700">Delete</button> */}
                     </div>
                   </td>
                 </tr>
@@ -344,7 +380,7 @@ const SAEmployees = () => {
             </tbody>
           </table>
 
-          <div className="flex justify-between items-center mt-4">
+          {/* <div className="flex justify-between items-center mt-4">
 
             <div className="text-sm text-gray-600">
               Total Employees: {totalElements}
@@ -378,7 +414,7 @@ const SAEmployees = () => {
                 Next
               </button>
             </div>
-          </div>
+          </div> */}
 
 
         </div>
@@ -401,10 +437,6 @@ const SAEmployees = () => {
                 <option value="">Select Department *</option>
                 {departments.map(dept => (<option key={dept.id} value={dept.id}>{dept.name}</option>))}
               </select>
-              {/* <select name="role" value={newEmployee.role} onChange={handleChange} required className="w-full px-3 py-2 border rounded-md">
-                <option value="EMPLOYEE">Employee</option>
-                <option value="SYSTEM_ADMIN">System Admin</option>
-              </select> */}
               <select
                 name="role"
                 value={newEmployee.role}
@@ -539,10 +571,6 @@ const SAEmployees = () => {
                 <option value="">Select Department</option>
                 {departments.map(dept => (<option key={dept.id} value={dept.id}>{dept.name}</option>))}
               </select>
-              {/* <select name="role" value={editEmployee.role} onChange={handleEditChange} required className="w-full px-3 py-2 border rounded-md">
-                <option value="EMPLOYEE">Employee</option>
-                <option value="SYSTEM_ADMIN">System Admin</option>
-              </select> */}
               <select
                 name="role"
                 value={editEmployee.role}
@@ -643,4 +671,4 @@ const SAEmployees = () => {
   );
 };
 
-export default SAEmployees; // Changed component name to match convention
+export default SAEmployees;

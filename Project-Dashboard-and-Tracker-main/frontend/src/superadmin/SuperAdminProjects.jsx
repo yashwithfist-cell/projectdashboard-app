@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../utils/api';
 import Select from 'react-select';
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 const StatCard = ({ title, value, color }) => (
     <div className={`bg-white p-6 rounded-lg shadow-md border-l-4 ${color}`}>
         <h3 className="text-gray-500 text-sm font-medium uppercase">{title}</h3>
@@ -10,6 +11,7 @@ const StatCard = ({ title, value, color }) => (
 );
 
 const SuperAdminProjects = () => {
+    const navigate = useNavigate();
     const [stats, setStats] = useState(null);
     const [projectHours, setProjectHours] = useState([]);
     const [employeeHours, setEmployeeHours] = useState([]);
@@ -152,7 +154,7 @@ const SuperAdminProjects = () => {
     if (isDashboardLoading) return <div className="p-8">Loading Dashboard Analytics...</div>;
 
     return (
-        <div className="p-8">
+        <div className="p-8 pt-0">
             {/* <h1 className="text-3xl font-bold mb-6">Projects Dashboard</h1> */}
             {/* <div className="p-6 bg-gray-100"> */}
             {/* KPI Cards */}
@@ -162,25 +164,31 @@ const SuperAdminProjects = () => {
                     <StatCard title="Total Departments" value={stats?.totalDepartments || 0} color="border-purple-500" />
                 </div> */}
             {/* </div> */}
-            <div className="flex justify-between items-center mb-6">
-                <h5 className="text-3xl font-bold">All Projects</h5>
+            <div className="flex justify-between items-center mb-4">
+                {/* <h5 className="text-3xl font-bold">List of Projects</h5> */}
+                <button
+                    onClick={() => navigate(-1)}
+                    className="bg-white hover:bg-gray-100 
+                       text-blue-600 font-semibold 
+                       px-4 py-2 rounded-lg transition">
+                    ← Back
+                </button>
                 <button onClick={() => handleOpenModal()} className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">Add Project</button>
             </div>
 
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
                 <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                    {/* <thead className="bg-gray-50">
                         <tr>
                             <th className="px-6 py-3 text-left text-xs font-bold uppercase">Project Name</th>
                             <th className="px-6 py-3 text-left text-xs font-bold uppercase">Client Name</th>
-                            {/* <th className="px-6 py-3 text-left text-xs font-bold uppercase">Hours Consumed</th> */}
                             <th className="px-6 py-3 text-center text-xs font-bold uppercase">Actions</th>
                         </tr>
-                    </thead>
+                    </thead> */}
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {projects.map((project) => (
+                        {projects.map((project, index) => (
                             <tr key={project.id}>
-                                {/* <td className="px-6 py-4">{project.name}</td> */}
+                                <td className="px-6 py-4">{index + 1}</td>
                                 <td className="px-6 py-4">
                                     <Link
                                         to={`/superadminmilestones/${project.id}`}
