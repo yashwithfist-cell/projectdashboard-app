@@ -222,24 +222,29 @@ const SuperAdminMilestones = () => {
 
     return (
         <div className="p-6 bg-gray-50 min-h-screen">
-            <div className="flex justify-between items-center mb-8">
-                <div className="flex items-center gap-4">
+            <div className="flex items-center mb-8">
+
+                <div className="flex-1">
+                    <h2 className="text-3xl font-bold text-gray-800">Milestones</h2>
+                </div>
+
+                <div className="flex-1 flex justify-center">
                     <button
                         onClick={() => navigate(-1)}
                         className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold px-4 py-2 rounded-lg"
                     >
                         ← Back
                     </button>
-
-                    <h2 className="text-3xl font-bold text-gray-800">Milestones</h2>
                 </div>
 
-                <button
-                    onClick={() => handleOpenModal()}
-                    className="bg-green-600 hover:bg-green-700 text-white font-semibold px-5 py-2 rounded-lg shadow-md"
-                >
-                    + Add Milestone
-                </button>
+                <div className="flex-1 flex justify-end">
+                    <button
+                        onClick={() => handleOpenModal()}
+                        className="bg-green-600 hover:bg-green-700 text-white font-semibold px-5 py-2 rounded-lg shadow-md"
+                    >
+                        + Add Milestone
+                    </button>
+                </div>
 
             </div>
 
@@ -253,7 +258,7 @@ const SuperAdminMilestones = () => {
                             <div className="flex flex-col gap-2">
                                 {disciplines
                                     .filter(d => d.milestoneId === milestone.milestoneId)
-                                    .map((d,index) => (
+                                    .map((d, index) => (
                                         <div
                                             key={d.id}
                                             className="flex items-center justify-between bg-gray-100 px-3 py-2 rounded-lg"
@@ -264,7 +269,7 @@ const SuperAdminMilestones = () => {
                                                 onClick={() => openFolder(projectId)}
                                                 className="text-blue-700 font-semibold cursor-pointer hover:underline"
                                             >
-                                                {(index+1)+'. '+d.name}
+                                                {(index + 1) + '. ' + d.name}
                                             </span>
 
                                             {/* <button onClick={() => openFolder(projectId)}>

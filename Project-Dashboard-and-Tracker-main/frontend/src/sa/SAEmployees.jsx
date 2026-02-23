@@ -27,6 +27,7 @@ const EmployeeDetailModal = ({ employee, onClose }) => {
             <div className="flex justify-between"><span className="font-semibold text-gray-600">Employee Device Code:</span> <span className="font-mono bg-gray-100 px-2 py-1 rounded">{employee.empDeviceCode}</span></div>
             <div className="flex justify-between"><span className="font-semibold text-gray-600">Name:</span> <span>{employee.name}</span></div>
             <div className="flex justify-between"><span className="font-semibold text-gray-600">Username:</span> <span className="font-mono">{employee.username}</span></div>
+            <div className="flex justify-between"><span className="font-semibold text-gray-600">Password:</span> <span className="font-mono">{employee.password}</span></div>
             <div className="flex justify-between"><span className="font-semibold text-gray-600">Department:</span> <span>{employee.departmentName || 'N/A'}</span></div>
             <div className="flex justify-between"><span className="font-semibold text-gray-600">Role:</span> <span className="px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">{employee.role}</span></div>
             <div className="flex justify-between"><span className="font-semibold text-gray-600">Bank Account No:</span> <span className="px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">{employee.bankAccountNo}</span></div>
@@ -100,6 +101,8 @@ const SAEmployees = () => {
     name: '',
     departmentId: '',
     role: '',
+    username: '',
+    password: '',
     joinDate: '',
     bankAccountNo: '',
     bankName: '',
@@ -215,6 +218,8 @@ const SAEmployees = () => {
       name: employee.name,
       departmentId: departments.find(d => d.name === employee.departmentName)?.id || '',
       role: employee.role || '',
+      username: employee.username || '',
+      password: employee.password || '',
       joinDate: employee.joinDate || '',
       bankAccountNo: employee.bankAccountNo || '',
       bankName: employee.bankName || '',
@@ -237,6 +242,8 @@ const SAEmployees = () => {
       name: editEmployee.name,
       departmentId: editEmployee.departmentId,
       role: editEmployee.role,
+      username: editEmployee.username,
+      password: editEmployee.password,
       joinDate: editEmployee.joinDate,
       bankAccountNo: editEmployee.bankAccountNo,
       bankName: editEmployee.bankName,
@@ -585,7 +592,8 @@ const SAEmployees = () => {
                   </option>
                 ))}
               </select>
-
+              <input type="text" name="username" placeholder="Username *" value={editEmployee.username} onChange={handleEditChange} required className="w-full px-2 py-1.5 border rounded-md text-sm" />
+              <input type="text" name="password" placeholder="Password *" value={editEmployee.password} onChange={handleEditChange} required className="w-full px-2 py-1.5 border rounded-md text-sm" />
               <input
                 type={editEmployee.joinDate ? "date" : "text"}
                 name="joinDate"

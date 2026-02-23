@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { toast, Toaster } from "react-hot-toast";
 import api from '../utils/api';
+import debounce from "lodash/debounce";
+
 
 export default function ProjectGraph({
   checkIns = [],
@@ -471,6 +473,56 @@ export default function ProjectGraph({
     }
   };
 
+  const rowsRef = useRef(tableRows);
+  const commentsRef = useRef(comments);
+
+  useEffect(() => {
+    rowsRef.current = tableRows;
+  }, [tableRows]);
+
+  useEffect(() => {
+    commentsRef.current = comments;
+  }, [comments]);
+
+  const silentSave = async () => {
+    const payload = rowsRef.current.map(row => ({
+      rowId: row.id,
+      type: row.type,
+      start: row.start,
+      end: row.end,
+      label: row.label,
+      duration: row.duration,
+      colour: row.color,
+      comment: commentsRef.current[row.id] || "",
+      projectName: row.projectName,
+      milestoneName: row.milestoneName,
+      disciplineName: row.disciplineName
+    }));
+
+    try {
+      await api.post("/timeline/saveAllTimeLineRows", payload, {
+        withCredentials: true
+      });
+
+      console.log("Auto-saved silently");
+    } catch (err) {
+      console.error("Auto-save failed");
+    }
+  };
+
+  const debouncedSilentSave = useRef(
+    debounce(() => {
+      silentSave();
+    }, 2000)
+  ).current;
+
+  useEffect(() => {
+    debouncedSilentSave();
+
+    return () => {
+      debouncedSilentSave.cancel();
+    };
+  }, [tableRows, comments]);
 
 
   return (
