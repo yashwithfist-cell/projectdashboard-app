@@ -94,7 +94,7 @@ public class WorkLogService {
 		LocalDate endOfMonth = today.with(TemporalAdjusters.lastDayOfMonth());
 
 		List<WorkLogEntry> entries = workLogEntryRepository
-				.findByEmployee_UsernameAndDateBetweenOrderByDateAsc(username, startOfMonth, endOfMonth);
+				.findByEmployee_UsernameAndDateBetweenOrderByDateDesc(username, startOfMonth, endOfMonth);
 
 		return entries.stream().map(WorkLogResponseDTO::new).collect(Collectors.toList());
 	}

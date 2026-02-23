@@ -21,7 +21,7 @@ import java.util.Optional;
 public interface WorkLogEntryRepository extends JpaRepository<WorkLogEntry, Long> {
 
 	// For the employee's own timesheet view
-	List<WorkLogEntry> findByEmployee_UsernameAndDateBetweenOrderByDateAsc(String username, LocalDate startDate,
+	List<WorkLogEntry> findByEmployee_UsernameAndDateBetweenOrderByDateDesc(String username, LocalDate startDate,
 			LocalDate endDate);
 
 	// For the admin's Master Data (Project-based) report
@@ -61,7 +61,7 @@ public interface WorkLogEntryRepository extends JpaRepository<WorkLogEntry, Long
 			WHERE w.employee.username = :username
 			AND (
 			        w.date = :today
-			     OR (w.endTime >= :start AND w.endTime < :end)
+			     OR (w.endTime >= :start AND w.endTime < :end) OR w.endTime IS NULL
 			)
 			""")
 	List<WorkLogEntry> findByDateAndEmployee_Username(@Param("today") LocalDate today,

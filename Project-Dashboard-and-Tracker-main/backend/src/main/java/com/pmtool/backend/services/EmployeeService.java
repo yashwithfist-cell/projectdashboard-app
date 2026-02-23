@@ -103,7 +103,8 @@ public class EmployeeService {
 		existingEmployee.setDepartment(department);
 		existingEmployee.setRole(dto.getRole());
 		existingEmployee.setJoinDate(dto.getJoinDate());
-		;
+		existingEmployee.setUsername(dto.getUsername());
+		existingEmployee.setPassword(dto.getPassword());
 		existingEmployee.setBankAccountNo(dto.getBankAccountNo());
 		existingEmployee.setBankName(dto.getBankName());
 		existingEmployee.setLocation(dto.getLocation());
@@ -148,11 +149,11 @@ public class EmployeeService {
 
 	private int getPriority(String id) {
 		if (id.startsWith("FES") && !id.startsWith("FEST")) {
-			return 1; // First group
+			return 1;
 		} else if (id.startsWith("FEST")) {
-			return 2; // Second group
+			return 2;
 		} else {
-			return 3; // Others
+			return 3;
 		}
 	}
 

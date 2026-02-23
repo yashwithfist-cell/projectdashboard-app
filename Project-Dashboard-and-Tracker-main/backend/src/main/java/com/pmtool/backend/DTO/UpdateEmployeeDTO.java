@@ -22,4 +22,6 @@ public class UpdateEmployeeDTO {
 	private String managerName;
 	private String leadName;
 	private String empDeviceCode;
+	private String username;
+	private String password;
 }

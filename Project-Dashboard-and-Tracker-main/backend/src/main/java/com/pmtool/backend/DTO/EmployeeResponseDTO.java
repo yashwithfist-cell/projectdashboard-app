@@ -20,6 +20,7 @@ public class EmployeeResponseDTO {
 	private String employeeId;
 	private String name;
 	private String username;
+	private String password;
 	private Role role;
 	private String departmentName;
 
@@ -50,6 +51,7 @@ public class EmployeeResponseDTO {
 		this.employeeId = employee.getEmployeeId();
 		this.name = employee.getName();
 		this.username = employee.getUsername();
+		this.password = employee.getPassword();
 		this.role = employee.getRole();
 		this.departmentName = employee.getDepartment() != null ? employee.getDepartment().getName() : "N/A";
 		this.bankAccountNo = employee.getBankAccountNo();
