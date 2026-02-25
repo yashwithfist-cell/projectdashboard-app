@@ -29,8 +29,9 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }) {
   }, []);
 
   const navItems = [
+    // { label: "Worklog", path: "/employeedashboard", icon: <FaClipboardList className="text-violet-600 hover:scale-110 duration-200" /> },
+    { label: "Worklog", path: "/employeedashboardnew", icon: <FaClipboardList className="text-violet-600 hover:scale-110 duration-200" /> },
     { label: "Profile", path: "/empprofile", icon: <FaUserCircle className="text-blue-600 hover:scale-110 duration-200" /> },
-    { label: "Worklog", path: "/employeedashboard", icon: <FaClipboardList className="text-violet-600 hover:scale-110 duration-200" /> },
     { label: "Leaves", path: "/employeeleave", icon: <FaCalendarAlt className="text-green-600 hover:scale-110 duration-200" /> },
     { label: "Attendance Log", path: "/empattendancelog", icon: <FaClock className="text-orange-600 hover:scale-110 duration-200" /> },
     { label: "Salary Slip", path: "/empsalaryslip", icon: <FaFileInvoice className="text-indigo-600 hover:scale-110 duration-200" /> },

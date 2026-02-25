@@ -36,6 +36,7 @@ import SAEmpTimeine from "./sa/SAEmpTimeline.jsx";
 import SAAdmin from "./sa/SAAdmin.jsx";
 import SAProjectData from "./sa/SAProjectData.jsx";
 import SAEmpData from "./sa/SAEmpData.jsx";
+import EmployeeDashboardNew from "./employee/EmployeeDashboardNew.jsx";
 
 
 // 🔒 NEW — Protected Route for Multi-User
@@ -121,7 +122,8 @@ function AppContent() {
           }
         >
           <Route path="/empprofile" element={<EmpProfile />} />
-          <Route path="/employeedashboard" element={<EmployeeDashboard />} />
+          {/* <Route path="/employeedashboard" element={<EmployeeDashboard />} /> */}
+           <Route path="/employeedashboardnew" element={<EmployeeDashboardNew />} />
           <Route path="/employeeleave" element={<EmployeeLeave />} />
           <Route path="/empattendancelog" element={<EmpAttendanceLog />} />
           <Route path="/empsalaryslip" element={<EmpSalarySlip />} />

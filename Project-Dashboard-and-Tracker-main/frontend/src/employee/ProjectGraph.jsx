@@ -289,17 +289,43 @@ export default function ProjectGraph({
 
         if (end <= start) return;
 
+        // let pointer = start;
+
+        // idleIntervals.forEach(idle => {
+        //   if (idle.start > pointer && idle.start < end) {
+        //     pushRow("Project", color, pointer, idle.start, getRowLabel(project), project.projectName, project.milestoneName, project.disciplineName);
+        //   }
+
+        //   pointer = Math.max(pointer, idle.end);
+        // });
+        // if (pointer < end) {
+        //   pushRow("Project", color, pointer, end, getRowLabel(project), project.projectName, project.milestoneName, project.disciplineName);
+        // }
         let pointer = start;
 
-        idleIntervals.forEach(idle => {
-          if (idle.start > pointer && idle.start < end) {
-            pushRow("Project", color, pointer, idle.start, getRowLabel(project), project.projectName, project.milestoneName, project.disciplineName);
+        for (let idle of idleIntervals) {
+          if (idle.end <= pointer) continue;
+          if (idle.start >= end) break;
+
+          if (idle.start > pointer) {
+            pushRow("Project", color, pointer, Math.min(idle.start, end),
+              getRowLabel(project),
+              project.projectName,
+              project.milestoneName,
+              project.disciplineName
+            );
           }
 
           pointer = Math.max(pointer, idle.end);
-        });
+        }
+
         if (pointer < end) {
-          pushRow("Project", color, pointer, end, getRowLabel(project), project.projectName, project.milestoneName, project.disciplineName);
+          pushRow("Project", color, pointer, end,
+            getRowLabel(project),
+            project.projectName,
+            project.milestoneName,
+            project.disciplineName
+          );
         }
       });
 
@@ -527,9 +553,9 @@ export default function ProjectGraph({
 
   return (
     <div className="flex-1">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">🕒 Today’s Timeline</h2>
+      {/* <h2 className="text-2xl font-bold text-gray-800 mb-4">🕒 Today’s Timeline</h2> */}
 
-      <div className="flex justify-between text-xs text-gray-500 mb-3 px-2">
+      <div className="flex justify-between text-xs text-gray-500 mb-0 px-2">
         <span>00:00</span>
         <span>06:00</span>
         <span>12:00</span>
@@ -537,16 +563,16 @@ export default function ProjectGraph({
         <span>23:59</span>
       </div>
 
-      <div className="relative h-20 mb-4 bg-gray-200 rounded-xl overflow-hidden shadow-md">
+      <div className="relative h-14 mb-4 bg-gray-200 rounded-xl overflow-hidden shadow-md">
         {blocks.map(b => (
           <div
             key={b.key}
-            className="absolute h-full rounded-md"
+            className="absolute h-full"
             style={{
               left: `${b.left}%`,
               width: `${b.width}%`,
               backgroundColor: b.color,
-              boxShadow: "inset 0 1px 2px rgba(0,0,0,0.5)",
+              // boxShadow: "inset 0 1px 2px rgba(0,0,0,0.5)",
               zIndex: b.z
             }}
             title={b.label}
@@ -556,7 +582,7 @@ export default function ProjectGraph({
         {checkIns.map((t, idx) => (
           <div
             key={`in-${idx}`}
-            className="absolute top-0 h-full w-3 bg-green-600 rounded-full shadow"
+            className="absolute top-0 h-full w-3 bg-green-600 shadow"
             style={{ left: `${toMinutes(t) / DAY_TOTAL * 100}%`, zIndex: 10 }}
             title={`Check-in ${formatTime(t)}`}
           />
@@ -565,13 +591,13 @@ export default function ProjectGraph({
         {checkOuts.map((t, idx) => (
           <div
             key={`out-${idx}`}
-            className="absolute top-0 h-full w-3 bg-red-600 rounded-full shadow"
+            className="absolute top-0 h-full w-3 bg-red-600 shadow"
             style={{ left: `${toMinutes(t) / DAY_TOTAL * 100}%`, zIndex: 11 }}
             title={`Check-out ${formatTime(t)}`}
           />
         ))}
       </div>
-      <div className="mt-4 flex flex-wrap gap-4 text-xs text-gray-600">
+      {/* <div className="mt-4 flex flex-wrap gap-4 text-xs text-gray-600">
         <span className="flex items-center gap-1"><span className="w-3 h-3 bg-[#F59E0B] rounded-full" /> Idle</span>
         <span className="flex items-center gap-1"><span className="w-3 h-3 bg-[#D1D5DB] rounded-full" /> Checked Out</span>
         {logs.map((p, idx) => (
@@ -581,15 +607,15 @@ export default function ProjectGraph({
         ))}
         <span className="flex items-center gap-1"><span className="w-3 h-3 bg-green-600 rounded-full" /> Check-in</span>
         <span className="flex items-center gap-1"><span className="w-3 h-3 bg-red-600 rounded-full" /> Check-out</span>
-      </div>
+      </div> */}
 
-      <div className="mt-6 overflow-x-auto">
+      <div className="mt-3 overflow-x-auto">
         <div className="flex justify-between items-center mb-2">
-          <h3 className="text-lg font-semibold">📊 Timeline Summary</h3>
+          {/* <h3 className="text-lg font-semibold">📊 Timeline Summary</h3> */}
 
           <button
             onClick={saveAllRows}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 text-sm font-semibold"
+            className="px-2 py-1 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 text-sm font-semibold"
           >
             💾 Save All
           </button>
@@ -598,12 +624,12 @@ export default function ProjectGraph({
         <table className="min-w-full border border-gray-300 rounded-lg text-sm">
           <thead className="bg-gray-100">
             <tr>
-              <th className="px-3 py-2 text-left">Color</th>
-              <th className="px-3 py-2 text-left">Tag</th>
-              <th className="px-3 py-2 text-left">Time</th>
-              <th className="px-3 py-2 text-left">Duration</th>
-              <th className="px-3 py-2 text-left">Label</th>
-              <th className="px-3 py-2 text-left">Comment</th>
+              <th className="px-2 py-1 text-left">Color</th>
+              {/* <th className="px-3 py-2 text-left">Tag</th> */}
+              <th className="px-2 py-1 text-left">Description</th>
+              <th className="px-2 py-1 text-left">Time</th>
+              <th className="px-2 py-1 text-left">Duration</th>
+              <th className="px-2 py-1 text-left">Comment</th>
               {/* <th className="px-3 py-2 text-left">Action</th> */}
             </tr>
           </thead>
@@ -613,10 +639,10 @@ export default function ProjectGraph({
                 <td className="px-2 py-1">
                   <span className="inline-block w-4 h-4 rounded" style={{ backgroundColor: r.color }} />
                 </td>
-                <td className="px-2 py-1 font-medium">{r.type}</td>
-                <td className="px-2 py-1">{r.start} – {r.end}</td>
-                <td className="px-2 py-1">{r.duration}</td>
                 <td className="px-2 py-1 text-gray-600">{r.label}</td>
+                {/* <td className="px-2 py-1 font-medium">{r.type}</td> */}
+                <td className="px-2 py-1">{r.type==="Check-in"? r.start : `${r.start} – ${r.end}`}</td>
+                <td className="px-2 py-1">{r.type==="Check-in"? "":r.duration}</td>
                 <td className="px-2 py-1">
                   <input
                     type="text"

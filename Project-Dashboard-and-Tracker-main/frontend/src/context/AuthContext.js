@@ -10,8 +10,8 @@ export function AuthProvider({ children }) {
   });
 
   // Login function
-  const login = (username, password, role) => {
-    const user = { username, password, role };
+  const login = (username, password, role, employeeName) => {
+    const user = { username, password, role ,employeeName};
     setActiveUser(user);
     localStorage.setItem("activeUser", JSON.stringify(user));
   };

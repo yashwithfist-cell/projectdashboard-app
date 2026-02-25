@@ -205,97 +205,97 @@ export default function TimerScreen({ onUpdate, summaryHoursData }) {
     // <div className="max-w-sm mx-auto p-6 bg-white shadow-xl rounded-3xl border border-gray-200 text-center transition-transform transform hover:-translate-y-1 hover:shadow-2xl">
     // <div className="w-full flex-1 p-6 bg-white shadow-xl rounded-3xl border border-gray-200 text-center transition-transform transform hover:-translate-y-1 hover:shadow-2xl">
     // <div className="w-full max-w-lg mx-auto p-6 bg-white shadow-xl rounded-3xl border border-gray-200 text-center transition-transform transform hover:-translate-y-1 hover:shadow-2xl">
-      <div className="w-full max-w-md mx-auto p-4 bg-white shadow-md rounded-2xl border text-center">
-      <h2 className="text-lg font-semibold text-gray-800 mb-2">Worked Time</h2>
-      <p className="text-5xl font-mono font-bold bg-gradient-to-r from-blue-500 via-teal-400 to-blue-600 bg-clip-text text-transparent mb-3">
-        {formatTime(displayTime)}
-      </p>
+    //   <div className="w-full max-w-md mx-auto p-4 bg-white shadow-md rounded-2xl border text-center">
+    //   <h2 className="text-lg font-semibold text-gray-800 mb-2">Worked Time</h2>
+    //   <p className="text-5xl font-mono font-bold bg-gradient-to-r from-blue-500 via-teal-400 to-blue-600 bg-clip-text text-transparent mb-3">
+    //     {formatTime(displayTime)}
+    //   </p>
 
-      <span className={`inline-flex items-center gap-2 px-5 py-3 rounded-full text-white font-semibold text-lg
-        ${isCheckedIn ? (isIdle ? 'bg-yellow-500' : 'bg-green-500') : 'bg-red-500'}`}>
-        {isCheckedIn ? (isIdle ? "Idle" : "Checked In") : "Checked Out"}
-      </span>
+    //   <span className={`inline-flex items-center gap-2 px-5 py-3 rounded-full text-white font-semibold text-lg
+    //     ${isCheckedIn ? (isIdle ? 'bg-yellow-500' : 'bg-green-500') : 'bg-red-500'}`}>
+    //     {isCheckedIn ? (isIdle ? "Idle" : "Checked In") : "Checked Out"}
+    //   </span>
 
-      <p className="mt-4 text-gray-500 text-sm">
-        Timer {isIdle ? "paused due to inactivity" : "updates live while checked in"}
-      </p>
+    //   <p className="mt-4 text-gray-500 text-sm">
+    //     Timer {isIdle ? "paused due to inactivity" : "updates live while checked in"}
+    //   </p>
 
 
-      <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-        <h3 className="font-bold mb-4 text-lg">📊 Day Summary (Hours)</h3>
+    //   <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+    //     <h3 className="font-bold mb-4 text-lg">📊 Day Summary (Hours)</h3>
 
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart
-            data={summaryHoursData || []}
-            margin={{ top: 5, right: 20, left: -10, bottom: 5 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
+    //     <ResponsiveContainer width="100%" height={300}>
+    //       <BarChart
+    //         data={summaryHoursData || []}
+    //         margin={{ top: 5, right: 20, left: -10, bottom: 5 }}
+    //       >
+    //         <CartesianGrid strokeDasharray="3 3" />
 
-            <XAxis dataKey="name" />
+    //         <XAxis dataKey="name" />
 
-            <YAxis
-              label={{ value: "Hours", angle: -90, position: "insideLeft" }}
-            />
+    //         <YAxis
+    //           label={{ value: "Hours", angle: -90, position: "insideLeft" }}
+    //         />
 
-            <Tooltip />
+    //         <Tooltip />
 
-            <Legend />
+    //         <Legend />
 
-            <Bar dataKey="value" name="Total Hours">
-              {(summaryHoursData || []).map((entry, index) => {
-                const colors = {
-                  Project: "#3B82F6",
-                  Idle: "#F59E0B",
-                  "Checked Out": "#D1D5DB"
-                };
+    //         <Bar dataKey="value" name="Total Hours">
+    //           {(summaryHoursData || []).map((entry, index) => {
+    //             const colors = {
+    //               Project: "#3B82F6",
+    //               Idle: "#F59E0B",
+    //               "Checked Out": "#D1D5DB"
+    //             };
 
-                return (
-                  <Cell key={index} fill={colors[entry.name]} />
-                );
-              })}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+    //             return (
+    //               <Cell key={index} fill={colors[entry.name]} />
+    //             );
+    //           })}
+    //         </Bar>
+    //       </BarChart>
+    //     </ResponsiveContainer>
 
-        <div className="my-5 border-t" />
+    //     <div className="my-5 border-t" />
 
-        {/* Centered Summary Table */}
-        <div className="flex justify-center">
-          <table className="w-64 text-sm">
-            <thead>
-              <tr className="text-gray-600 border-b">
-                <th className="text-left py-2">Type</th>
-                <th className="text-right py-2">Total</th>
-              </tr>
-            </thead>
+    //     <div className="flex justify-center">
+    //       <table className="w-64 text-sm">
+    //         <thead>
+    //           <tr className="text-gray-600 border-b">
+    //             <th className="text-left py-2">Type</th>
+    //             <th className="text-right py-2">Total</th>
+    //           </tr>
+    //         </thead>
 
-            <tbody>
-              {summaryTableData.map(row => (
-                <tr key={row.name} className="border-b last:border-0">
-                  <td className="py-2 font-medium flex items-center gap-2">
-                    <span
-                      className="w-2.5 h-2.5 rounded-full"
-                      style={{
-                        backgroundColor: {
-                          Project: "#3B82F6",
-                          Idle: "#F59E0B",
-                          "Checked Out": "#D1D5DB"
-                        }[row.name]
-                      }}
-                    />
-                    {row.name}
-                  </td>
+    //         <tbody>
+    //           {summaryTableData.map(row => (
+    //             <tr key={row.name} className="border-b last:border-0">
+    //               <td className="py-2 font-medium flex items-center gap-2">
+    //                 <span
+    //                   className="w-2.5 h-2.5 rounded-full"
+    //                   style={{
+    //                     backgroundColor: {
+    //                       Project: "#3B82F6",
+    //                       Idle: "#F59E0B",
+    //                       "Checked Out": "#D1D5DB"
+    //                     }[row.name]
+    //                   }}
+    //                 />
+    //                 {row.name}
+    //               </td>
 
-                  <td className="py-2 text-right font-semibold">
-                    {toHM(row.minutes)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+    //               <td className="py-2 text-right font-semibold">
+    //                 {toHM(row.minutes)}
+    //               </td>
+    //             </tr>
+    //           ))}
+    //         </tbody>
+    //       </table>
+    //     </div>
 
-      </div>
-    </div>
+    //   </div>
+    // </div>
+    <></>
   );
 }

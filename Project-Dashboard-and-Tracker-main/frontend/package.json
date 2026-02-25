@@ -1,6 +1,6 @@
 {
   "name": "project-dashboard",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "private": true,
   "type": "module",
   "main": "main.js",
@@ -19,6 +19,7 @@
     "@fullcalendar/interaction": "^6.1.19",
     "@fullcalendar/react": "^6.1.19",
     "@fullcalendar/timegrid": "^6.1.19",
+    "@stomp/stompjs": "^7.3.0",
     "axios": "^1.11.0",
     "date-fns": "^4.1.0",
     "electron-updater": "^6.7.3",
@@ -36,6 +37,7 @@
     "react-scripts": "^5.0.1",
     "react-select": "^5.10.2",
     "recharts": "^3.1.2",
+    "sockjs-client": "^1.6.1",
     "web-vitals": "^5.1.0"
   },
   "devDependencies": {

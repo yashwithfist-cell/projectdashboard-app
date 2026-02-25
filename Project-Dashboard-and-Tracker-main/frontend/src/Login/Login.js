@@ -35,7 +35,7 @@ function Login({ onLoginSuccess }) {
         if (userData.status === "ACTIVE") {
           if (userData?.role) {
             // ✔ Multi-user Auth: this will set activeUser and store user in users[]
-            login(username, password, userData.role);
+            login(username, password, userData.role,userData.employeeName);
 
             if (onLoginSuccess) onLoginSuccess();
           } else {
