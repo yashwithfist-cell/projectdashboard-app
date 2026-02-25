@@ -26,8 +26,8 @@ public class WorkLogResponseDTO {
 		this.date = entity.getDate();
 		this.task = entity.getTask();
 		this.description = entity.getDescription();
-		this.startTime = entity.getStartTime().toLocalTime();
-		this.endTime = (entity.getEndTime() != null) ? entity.getEndTime().toLocalTime() : LocalTime.now();
+		this.startTime = entity.getStartTime().toLocalTime().withNano(0);
+		this.endTime = (entity.getEndTime() != null) ? entity.getEndTime().toLocalTime() : LocalTime.now().withNano(0);
 		this.hoursWorked = entity.getHoursWorked();
 		this.projectName = (entity.getProject() != null) ? entity.getProject().getName() : "N/A";
 		this.milestoneName = (entity.getMilestone() != null) ? entity.getMilestone().getName() : "N/A";

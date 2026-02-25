@@ -42,20 +42,22 @@ public class WorkLogService {
 	public WorkLogResponseDTO saveNewEntry(WorkLogEntryDTO dto, String username) {
 		Employee employee = employeeRepository.findByUsername(username)
 				.orElseThrow(() -> new RuntimeException("Authenticated employee not found in database"));
-
+		LocalDateTime startTime=LocalDateTime.now().withNano(0);
 		WorkLogEntry newEntry = new WorkLogEntry();
 		newEntry.setEmployee(employee);
 		newEntry.setDate(dto.getDate());
 		newEntry.setTask(dto.getTask());
-		newEntry.setDescription(dto.getDescription());
-		newEntry.setStartTime(LocalDateTime.of(dto.getDate(), dto.getStartTime()));
+//		newEntry.setDescription(dto.getDescription());
+//		newEntry.setStartTime(LocalDateTime.of(dto.getDate(), dto.getStartTime()));
+		newEntry.setStartTime(startTime);
 		newEntry.setEndTime((dto.getEndTime() != null) ? LocalDateTime.of(dto.getDate(), dto.getEndTime()) : null);
-		if (dto.getEndTime()==null) {
+		if (dto.getEndTime() == null) {
 			newEntry.setCurrentProject(true);
 		}
 		WorkLogEntry workLogPrev = workLogEntryRepository.findFirstByEmployee_UsernameOrderByIdDesc(username);
 		if (workLogPrev != null) {
-			workLogPrev.setEndTime(LocalDateTime.of(dto.getDate(), dto.getStartTime()));
+//			workLogPrev.setEndTime(LocalDateTime.of(dto.getDate(), dto.getStartTime()));
+			workLogPrev.setEndTime(startTime);
 			workLogPrev.setCurrentProject(false);
 			workLogEntryRepository.save(workLogPrev);
 		}
@@ -102,9 +104,10 @@ public class WorkLogService {
 	@Transactional(readOnly = true)
 	public List<WorkLogResponseDTO> getMyDailyWorkLogs(String username) {
 		LocalDate today = LocalDate.now();
-		LocalDateTime startTime=LocalDateTime.of(today, LocalTime.of(00, 00, 00));
-		LocalDateTime endTime=LocalDateTime.of(today, LocalTime.of(23, 59, 59));
-		List<WorkLogEntry> entries = workLogEntryRepository.findByDateAndEmployee_Username(today,startTime,endTime,username);
+		LocalDateTime startTime = LocalDateTime.of(today, LocalTime.of(00, 00, 00));
+		LocalDateTime endTime = LocalDateTime.of(today, LocalTime.of(23, 59, 59));
+		List<WorkLogEntry> entries = workLogEntryRepository.findByDateAndEmployee_Username(today, startTime, endTime,
+				username);
 		return entries.stream().sorted(Comparator.comparing(WorkLogEntry::getId)).map(WorkLogResponseDTO::new)
 				.collect(Collectors.toList());
 	}
